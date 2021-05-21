@@ -23,6 +23,9 @@ struct CQStatData {
   double sum          { 0.0 };   //!< sum of values
   double mean         { 0.0 };   //!< mean of values
   double stddev       { 0.0 };   //!< standard deviation of values
+  bool   scaled       { false }; //!< are values re-scaled
+  double scaleMin     { 0.0 };   //!< scale min
+  double scaleMax     { 0.0 };   //!< scale max
 
   void reset() {
     set         = false;
@@ -39,6 +42,9 @@ struct CQStatData {
     sum         = 0.0;
     mean        = 0.0;
     stddev      = 0.0;
+    scaled      = false;
+    scaleMin    = 0.0;
+    scaleMax    = 0.0;
   }
 
   template<class T>
