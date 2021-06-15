@@ -28,8 +28,18 @@ class CQDataModel : public CQBaseModel {
 
   //---
 
+  void copyModel(CQDataModel *model);
+
+  //---
+
   //! resize
-  void resizeModel(int numCols, int numRows);
+  virtual void resizeModel(int numCols, int numRows);
+
+  //! add new rows at end
+  virtual void addRow(int n=1);
+
+  //! add new columns to right
+  virtual void addColumn(int n=1);
 
   //---
 
@@ -108,17 +118,21 @@ class CQDataModel : public CQBaseModel {
     bool    valid  { false };
   };
 
-  typedef std::vector<FilterData> FilterDatas;
+  using FilterDatas = std::vector<FilterData>;
 
-  bool            readOnly_     { false };   //!< is read only
-  QString         filter_;                   //!< filter text
-  QString         filename_;                 //!< input filename
-  Cells           hheader_;                  //!< horizontal header values
-  Cells           vheader_;                  //!< vertical header values
-  Data            data_;                     //!< row values
-  bool            filterInited_ { false };   //!< filter initialized
-  FilterDatas     filterDatas_;              //!< filter datas
-  CQModelDetails* details_      { nullptr }; //!< model details
+  bool readOnly_ { false }; //!< is read only
+
+  QString filename_; //!< input filename
+
+  Cells hheader_;  //!< horizontal header values
+  Cells vheader_;  //!< vertical header values
+  Data  data_;     //!< row values
+
+  QString     filter_;                 //!< filter text
+  bool        filterInited_ { false }; //!< filter initialized
+  FilterDatas filterDatas_;            //!< filter datas
+
+  CQModelDetails* details_ { nullptr }; //!< model details
 };
 
 #endif

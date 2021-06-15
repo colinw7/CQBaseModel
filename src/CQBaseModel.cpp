@@ -70,12 +70,32 @@ void initTypes() {
 //---
 
 CQBaseModel::
-CQBaseModel()
+CQBaseModel(QObject *parent) :
+ QAbstractItemModel(parent)
 {
   setObjectName("baseModel");
 
   initTypes();
 }
+
+//---
+
+void
+CQBaseModel::
+copyModel(CQBaseModel *model)
+{
+  beginResetModel();
+
+  // data
+  columnDatas_ = model->columnDatas_;
+  rowDatas_    = model->rowDatas_;
+  dataType_    = model->dataType_;
+  nameValues_  = model->nameValues_;
+
+  endResetModel();
+}
+
+//---
 
 void
 CQBaseModel::
@@ -664,6 +684,28 @@ getRowData(int row)
     p1 = th->rowDatas_.insert(p1, RowDatas::value_type(row, RowData(row)));
 
   return (*p1).second;
+}
+
+//------
+
+void
+CQBaseModel::
+beginResetModel()
+{
+  if (resetDepth_ == 0)
+    QAbstractItemModel::beginResetModel();
+
+  ++resetDepth_;
+}
+
+void
+CQBaseModel::
+endResetModel()
+{
+  --resetDepth_;
+
+  if (resetDepth_ == 0)
+    QAbstractItemModel::endResetModel();
 }
 
 //------

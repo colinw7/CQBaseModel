@@ -41,11 +41,67 @@ init(int numCols, int numRows)
 
 void
 CQDataModel::
+copyModel(CQDataModel *model)
+{
+  beginResetModel();
+
+  // copy data
+  hheader_ = model->hheader_;
+  vheader_ = model->vheader_;
+  data_    = model->data_;
+
+  CQBaseModel::copyModel(model);
+
+  endResetModel();
+}
+
+void
+CQDataModel::
 resizeModel(int numCols, int numRows)
 {
   beginResetModel();
 
   init(numCols, numRows);
+
+  endResetModel();
+}
+
+void
+CQDataModel::
+addRow(int n)
+{
+  beginResetModel();
+
+  if (! vheader_.empty())
+    vheader_.push_back("");
+
+  for (int i = 0; i < n; ++i) {
+    Cells row;
+
+    row.resize(columnCount());
+
+    data_.push_back(row);
+  }
+
+  endResetModel();
+}
+
+void
+CQDataModel::
+addColumn(int n)
+{
+  beginResetModel();
+
+  int nr = rowCount();
+
+  hheader_.push_back("");
+
+  for (int ir = 0; ir < nr; ++ir) {
+    auto &row = data_[ir];
+
+    for (int i = 0; i < n; ++i)
+      row.push_back("");
+  }
 
   endResetModel();
 }

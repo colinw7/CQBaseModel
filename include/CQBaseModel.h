@@ -53,9 +53,13 @@ class CQBaseModel : public QAbstractItemModel {
   };
 
  public:
-  CQBaseModel();
+  CQBaseModel(QObject *parent=nullptr);
 
   virtual ~CQBaseModel() { }
+
+  //---
+
+  void copyModel(CQBaseModel *model);
 
   //---
 
@@ -138,6 +142,11 @@ class CQBaseModel : public QAbstractItemModel {
   //! get set row group
   QVariant rowGroup(int row) const;
   bool setRowGroup(int row, const QVariant &v);
+
+  //---
+
+  void beginResetModel();
+  void endResetModel();
 
   //---
 
@@ -271,14 +280,16 @@ class CQBaseModel : public QAbstractItemModel {
   void genColumnTypeI(ColumnData &columnData);
 
  protected:
-  QString            title_;                          //!< model title
-  ColumnDatas        columnDatas_;                    //!< column datas
-  RowDatas           rowDatas_;                       //!< row datas
-  int                maxTypeRows_ { -1 };             //!< max rows to determine type
-  DataType           dataType_    { DATA_TYPE_NONE }; //!< input data type
-  NameValues         nameValues_;                     //!< name values
-  mutable std::mutex mutex_;                          //!< mutex
-  mutable std::mutex typeMutex_;                      //!< type mutex
+  QString     title_;                          //!< model title
+  ColumnDatas columnDatas_;                    //!< column datas
+  RowDatas    rowDatas_;                       //!< row datas
+  int         maxTypeRows_ { -1 };             //!< max rows to determine type
+  DataType    dataType_    { DATA_TYPE_NONE }; //!< input data type
+  NameValues  nameValues_;                     //!< name values
+
+  mutable std::mutex mutex_;            //!< mutex
+  mutable std::mutex typeMutex_;        //!< type mutex
+  int                resetDepth_ { 0 }; //!< reset model depth
 };
 
 #endif
