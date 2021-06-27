@@ -37,7 +37,13 @@ enum class CQBaseModelRole {
   DataMin           = Type + 18,        //!< column calculated value min
   DataMax           = Type + 19,        //!< column calculated value max
   HeaderType        = Type + 20,        //!< column header type
-  HeaderTypeValues  = Type + 21         //!< column header type values
+  HeaderTypeValues  = Type + 21,        //!< column header type values
+  FillColor         = Type + 22,        //!< cell fll color
+  SymbolType        = Type + 23,        //!< cell symbol type
+  SymbolSize        = Type + 24,        //!< cell symbol size
+  FontSize          = Type + 25,        //!< cell font size
+  Style             = Type + 26,        //!< cell style
+  Export            = Type + 27         //!< export role
 };
 
 //! model value types supported by CQBaseModel

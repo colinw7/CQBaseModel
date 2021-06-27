@@ -74,7 +74,7 @@ class CQModelDetails : public QObject {
   CQModelDetails &operator=(const CQModelDetails &) = delete;
 
  protected:
-  using ColumnDetails = std::map<int,CQModelColumnDetails *>;
+  using ColumnDetails = std::map<int, CQModelColumnDetails *>;
 
   QAbstractItemModel* model_ { nullptr }; //!< model
 
@@ -187,7 +187,7 @@ class CQModelColumnDetails {
   CQModelColumnDetails &operator=(const CQModelColumnDetails &) = delete;
 
  protected:
-  using VariantInds = std::map<QVariant,int>;
+  using VariantInds = std::map<QVariant, int>;
 
   CQModelDetails* details_ { nullptr };
   int             column_  { -1 };

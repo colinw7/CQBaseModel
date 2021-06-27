@@ -822,7 +822,7 @@ initPatterns(int numIdeal) const
   if (! spatternsSet_) {
     auto *th = const_cast<CQSValues *>(this);
 
-    using DepthCountMap = std::map<int,CQTriePatterns>;
+    using DepthCountMap = std::map<int, CQTriePatterns>;
 
     DepthCountMap depthCountMap;
 

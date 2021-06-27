@@ -3,21 +3,24 @@
 #include <iostream>
 
 CQDataModel::
-CQDataModel()
+CQDataModel(QObject *parent) :
+ CQBaseModel(parent)
 {
-  setObjectName("dataModel");
-
-  connect(this, SIGNAL(columnTypeChanged(int)), this, SLOT(resetColumnCache(int)));
+  init();
 }
 
 CQDataModel::
-CQDataModel(int numCols, int numRows)
+CQDataModel(QObject *parent, int numCols, int numRows) :
+ CQBaseModel(parent)
 {
-  setObjectName("dataModel");
-
   init(numCols, numRows);
+}
 
-  connect(this, SIGNAL(columnTypeChanged(int)), this, SLOT(resetColumnCache(int)));
+CQDataModel::
+CQDataModel(int numCols, int numRows) :
+ CQBaseModel(nullptr)
+{
+  init(numCols, numRows);
 }
 
 CQDataModel::
@@ -30,13 +33,19 @@ void
 CQDataModel::
 init(int numCols, int numRows)
 {
-  hheader_.resize(numCols);
-  vheader_.resize(numRows);
+  setObjectName("dataModel");
 
-  data_.resize(numRows);
+  if (numCols > 0 && numRows > 0) {
+    hheader_.resize(numCols);
+    vheader_.resize(numRows);
 
-  for (int i = 0; i < numRows; ++i)
-    data_[i].resize(numCols);
+    data_.resize(numRows);
+
+    for (int i = 0; i < numRows; ++i)
+      data_[i].resize(numCols);
+  }
+
+  connect(this, SIGNAL(columnTypeChanged(int)), this, SLOT(resetColumnCache(int)));
 }
 
 void
@@ -630,7 +639,7 @@ applyFilterColumns(const QStringList &columns)
   Data  data    = data_;
   Cells hheader = hheader_;
 
-  std::map<int,int> columnMap;
+  std::map<int, int> columnMap;
 
   int nc1 = hheader_.size();
   int nc2 = columns.length();

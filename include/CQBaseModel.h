@@ -216,9 +216,9 @@ class CQBaseModel : public QAbstractItemModel {
   void columnHeaderTypeChanged(int column);
 
  protected:
-  using RowValues     = std::map<int,QVariant>;
-  using RoleRowValues = std::map<int,RowValues>;
-  using NameValues    = std::map<QString,QVariant>;
+  using RowValues     = std::map<int, QVariant>;
+  using RoleRowValues = std::map<int, RowValues>;
+  using NameValues    = std::map<QString, QVariant>;
   using ModelType     = CQBaseModelType;
 
   //---
@@ -245,7 +245,7 @@ class CQBaseModel : public QAbstractItemModel {
     RoleRowValues roleRowValues;                          //!< row role values
   };
 
-  using ColumnDatas = std::map<int,ColumnData>;
+  using ColumnDatas = std::map<int, ColumnData>;
 
   //---
 
@@ -259,7 +259,7 @@ class CQBaseModel : public QAbstractItemModel {
     QVariant group;      //!< group
   };
 
-  using RowDatas = std::map<int,RowData>;
+  using RowDatas = std::map<int, RowData>;
 
   //---
 

@@ -70,6 +70,9 @@ const QStringList &roleNames();
 //! name to base mode role
 int nameToRole(const QString &name);
 
+//! string to model index
+bool stringToRowCol(const QString &name, int &row, int &col);
+
 }
 
 #endif

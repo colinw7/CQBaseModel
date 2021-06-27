@@ -9,7 +9,7 @@
  */
 class CQModelNameValues {
  public:
-  using NameValues = std::map<QString,QVariant>;
+  using NameValues = std::map<QString, QVariant>;
 
  public:
   CQModelNameValues() { }

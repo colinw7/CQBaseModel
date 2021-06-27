@@ -274,14 +274,20 @@ roleNames()
 {
   static QStringList names;
 
-  if (names.empty())
+  if (names.empty()) {
+    // standard
     names << "display" << "edit" << "user" << "font" << "size_hint" <<
              "tool_tip" << "background" << "foreground" << "text_alignment" <<
-             "text_color" << "decoration" <<
-             "type" << "base_type" << "type_values" << "min" << "max" << "sorted" <<
+             "text_color" << "decoration";
+
+    // custom
+    names << "type" << "base_type" << "type_values" << "min" << "max" << "sorted" <<
              "sort_order" << "title" << "tip" << "key" << "raw_value" << "intermediate_value" <<
-             "cached_value" << "output_value" << "group" << "format" << "data_min" << "data_max" <<
-             "header_type" << "header_type_values";
+             "cached_value" << "output_value" << "group" << "format" << "iformat" << "oformat" <<
+             "data_min" << "data_max" << "header_type" << "header_type_values" <<
+             "fill_color" << "symbol_type" << "symbol_size" << "font_size" << "style" <<
+             "export";
+  }
 
   return names;
 };
@@ -289,6 +295,7 @@ roleNames()
 int
 nameToRole(const QString &name)
 {
+  // standard
   if      (name == "display"       ) return Qt::DisplayRole;
   else if (name == "edit"          ) return Qt::EditRole;
   else if (name == "user"          ) return Qt::UserRole;
@@ -301,6 +308,7 @@ nameToRole(const QString &name)
   else if (name == "text_color"    ) return Qt::TextColorRole;
   else if (name == "decoration"    ) return Qt::DecorationRole;
 
+  // custom
   else if (name == "type"              ) return (int) CQBaseModelRole::Type;
   else if (name == "base_type"         ) return (int) CQBaseModelRole::BaseType;
   else if (name == "type_values"       ) return (int) CQBaseModelRole::TypeValues;
@@ -317,10 +325,18 @@ nameToRole(const QString &name)
   else if (name == "output_value"      ) return (int) CQBaseModelRole::OutputValue;
   else if (name == "group"             ) return (int) CQBaseModelRole::Group;
   else if (name == "format"            ) return (int) CQBaseModelRole::Format;
+  else if (name == "iformat"           ) return (int) CQBaseModelRole::IFormat;
+  else if (name == "oformat"           ) return (int) CQBaseModelRole::OFormat;
   else if (name == "data_min"          ) return (int) CQBaseModelRole::DataMin;
   else if (name == "data_max"          ) return (int) CQBaseModelRole::DataMax;
   else if (name == "header_type"       ) return (int) CQBaseModelRole::HeaderType;
   else if (name == "header_type_values") return (int) CQBaseModelRole::HeaderTypeValues;
+  else if (name == "fill_color"        ) return (int) CQBaseModelRole::FillColor;
+  else if (name == "symbol_type"       ) return (int) CQBaseModelRole::SymbolType;
+  else if (name == "symbol_size"       ) return (int) CQBaseModelRole::SymbolSize;
+  else if (name == "font_size"         ) return (int) CQBaseModelRole::FontSize;
+  else if (name == "style"             ) return (int) CQBaseModelRole::Style;
+  else if (name == "export"            ) return (int) CQBaseModelRole::Export;
 
   bool ok;
 
@@ -330,6 +346,28 @@ nameToRole(const QString &name)
     return role;
 
   return -1;
+}
+
+bool
+stringToRowCol(const QString &str, int &row, int &col)
+{
+  // get cell index
+  row = -1;
+  col = -1;
+
+  auto strs = str.split(":");
+
+  if (strs.length() != 2)
+    return false;
+
+  bool ok;
+  row = strs[0].toInt(&ok); if (! ok) row = -1;
+  col = strs[1].toInt(&ok); if (! ok) col = -1;
+
+  if (row < 0 || col < 0)
+    return false;
+
+  return true;
 }
 
 }

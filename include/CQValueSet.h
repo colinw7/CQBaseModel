@@ -156,9 +156,9 @@ class CQRValues {
   };
 
   using OptValues = std::vector<OptReal>;
-  using KeyCount  = std::pair<int,int>;
-  using ValueSet  = std::map<double,KeyCount,RealCmp>;
-  using SetValues = std::map<int,double>;
+  using KeyCount  = std::pair<int, int>;
+  using ValueSet  = std::map<double, KeyCount, RealCmp>;
+  using SetValues = std::map<int, double>;
 
   OptValues                 values_;               //!< all real values
   Values                    svalues_;              //!< sorted real values
@@ -301,9 +301,9 @@ class CQIValues {
 
  private:
   using OptValues = std::vector<OptInt>;
-  using KeyCount  = std::pair<int,int>;
-  using ValueSet  = std::map<int,KeyCount>;
-  using SetValues = std::map<int,int>;
+  using KeyCount  = std::pair<int, int>;
+  using ValueSet  = std::map<int, KeyCount>;
+  using SetValues = std::map<int, int>;
 
   OptValues                 values_;               //!< all integer values
   Values                    svalues_;              //!< sorted integer values
@@ -420,9 +420,9 @@ class CQSValues {
 
  private:
   using OptValues = std::vector<OptString>;
-  using KeyCount  = std::pair<int,int>;
-  using ValueSet  = std::map<QString,KeyCount>;
-  using SetValues = std::map<int,QString>;
+  using KeyCount  = std::pair<int, int>;
+  using ValueSet  = std::map<QString, KeyCount>;
+  using SetValues = std::map<int, QString>;
 
   OptValues values_;        //!< all string values
   ValueSet  valset_;        //!< unique indexed string values

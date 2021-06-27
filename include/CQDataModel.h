@@ -20,8 +20,11 @@ class CQDataModel : public CQBaseModel {
   Q_PROPERTY(QString filename READ filename   WRITE setFilename)
 
  public:
-  CQDataModel();
+  using Cells = std::vector<QVariant>;
 
+ public:
+  CQDataModel(QObject *parent=nullptr);
+  CQDataModel(QObject *parent, int numCols, int numRows);
   CQDataModel(int numCols, int numRows);
 
   virtual ~CQDataModel();
@@ -84,15 +87,18 @@ class CQDataModel : public CQBaseModel {
 
   Qt::ItemFlags flags(const QModelIndex &index) const override;
 
+  //---
+
+  virtual bool acceptsRow(const Cells &cells) const;
+
  protected slots:
   void resetColumnCache(int column);
 
  protected:
-  using Cells = std::vector<QVariant>;
   using Data  = std::vector<Cells>;
 
  protected:
-  void init(int numCols, int numRows);
+  void init(int numCols=0, int numRows=0);
 
   //---
 
@@ -100,8 +106,6 @@ class CQDataModel : public CQBaseModel {
 
   virtual bool isFilterInited() const { return filterInited_; }
   virtual void setFilterInited(bool b) { filterInited_ = b; }
-
-  virtual bool acceptsRow(const Cells &cells) const;
 
   //---
 
