@@ -99,6 +99,7 @@ class CQDataModel : public CQBaseModel {
 
  protected:
   void init(int numCols=0, int numRows=0);
+  void init1(int numCols, int numRows);
 
   //---
 

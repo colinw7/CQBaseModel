@@ -35,17 +35,23 @@ init(int numCols, int numRows)
 {
   setObjectName("dataModel");
 
-  if (numCols > 0 && numRows > 0) {
-    hheader_.resize(numCols);
-    vheader_.resize(numRows);
-
-    data_.resize(numRows);
-
-    for (int i = 0; i < numRows; ++i)
-      data_[i].resize(numCols);
-  }
+  if (numCols > 0 && numRows > 0)
+    init1(numCols, numRows);
 
   connect(this, SIGNAL(columnTypeChanged(int)), this, SLOT(resetColumnCache(int)));
+}
+
+void
+CQDataModel::
+init1(int numCols, int numRows)
+{
+  hheader_.resize(numCols);
+  vheader_.resize(numRows);
+
+  data_.resize(numRows);
+
+  for (int i = 0; i < numRows; ++i)
+    data_[i].resize(numCols);
 }
 
 void
@@ -70,7 +76,7 @@ resizeModel(int numCols, int numRows)
 {
   beginResetModel();
 
-  init(numCols, numRows);
+  init1(numCols, numRows);
 
   endResetModel();
 }
@@ -465,8 +471,6 @@ data(const QModelIndex &index, int role) const
 
     if (getRowRoleValue(r, role, var))
       return var;
-
-    return QVariant();
   }
 
   return CQBaseModel::data(index, role);
@@ -589,7 +593,7 @@ CQDataModel::
 flags(const QModelIndex &index) const
 {
   if (! index.isValid())
-    return 0;
+    return Qt::ItemFlags();
 
   Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 
