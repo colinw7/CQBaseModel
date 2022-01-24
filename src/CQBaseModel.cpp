@@ -25,6 +25,7 @@ void addAlias(const QString &alias, const QString &name) {
 }
 
 void initTypes() {
+  // Note: all names in lower case
   if (s_typeName.empty()) {
     addType(CQBaseModelType::BOOLEAN        , "boolean"        );
     addType(CQBaseModelType::INTEGER        , "integer"        );
@@ -1072,12 +1073,14 @@ nameType(const QString &name)
 {
   initTypes();
 
-  auto p = s_nameType.find(name);
+  auto lname = name.toLower();
+
+  auto p = s_nameType.find(lname);
 
   if (p != s_nameType.end())
     return (*p).second;
 
-  auto pa = s_aliasName.find(name);
+  auto pa = s_aliasName.find(lname);
 
   if (pa != s_aliasName.end())
     return nameType((*pa).second);
