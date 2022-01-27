@@ -719,7 +719,7 @@ headerData(int section, Qt::Orientation orientation, int role) const
     if (type == CQBaseModelType::NONE)
       return QVariant();
 
-    return QVariant((int) type);
+    return QVariant(CQModelUtil::typeCast(type));
   };
 
   // generic column data
@@ -971,7 +971,7 @@ variantToType(const QVariant &var, bool *ok)
     type = nameType(str);
   }
 
-  if (! isType((int) type)) {
+  if (! isType(CQModelUtil::typeCast(type))) {
     if (ok)
       *ok = false;
   }
@@ -983,7 +983,7 @@ QVariant
 CQBaseModel::
 typeToVariant(CQBaseModelType type)
 {
-  return QVariant((int) type);
+  return QVariant(CQModelUtil::typeCast(type));
 }
 
 bool
@@ -1025,7 +1025,7 @@ typeStringToVariant(const QString &str, CQBaseModelType type)
     long integer = toInt(str, ok);
 
     if (ok)
-      return QVariant(int(integer));
+      return CQModelUtil::intVariant(integer);
 
     if (! str.length())
       return QVariant();

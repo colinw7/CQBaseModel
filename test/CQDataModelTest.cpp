@@ -128,7 +128,7 @@ class CQProxyModel : public QAbstractProxyModel {
 
   //---
 
-  void sort(int column, Qt::SortOrder order=Qt::AscendingOrder) {
+  void sort(int column, Qt::SortOrder order=Qt::AscendingOrder) override {
     emit layoutAboutToBeChanged();
 
     typedef QPair<QString, int> ValueRow;
@@ -181,7 +181,7 @@ class CQProxyModel : public QAbstractProxyModel {
   // # Abstarct Proxy Model APIS
 
   // map source index to proxy index
-  QModelIndex mapFromSource(const QModelIndex &sourceIndex) const {
+  QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override {
     if (! sourceIndex.isValid())
       return QModelIndex();
 
@@ -192,7 +192,7 @@ class CQProxyModel : public QAbstractProxyModel {
   }
 
   // map proxy index to source index
-  QModelIndex mapToSource(const QModelIndex &proxyIndex) const {
+  QModelIndex mapToSource(const QModelIndex &proxyIndex) const override {
     if (! proxyIndex.isValid())
       return QModelIndex();
 

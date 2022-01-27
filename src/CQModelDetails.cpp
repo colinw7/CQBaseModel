@@ -7,6 +7,21 @@
 
 #include <QAbstractItemModel>
 
+namespace {
+
+long varToInt(const QVariant &var, bool *ok) {
+  *ok = true;
+
+  if (var.type() == QVariant::LongLong)
+    return var.value<qlonglong>();
+
+  return var.toInt(ok);
+}
+
+}
+
+//------
+
 CQModelDetails::
 CQModelDetails(QAbstractItemModel *model) :
  model_(model)
@@ -536,7 +551,7 @@ isIncreasing() const
     if (ok && var.isValid()) {
       bool ok;
 
-      long order = var.toInt(&ok);
+      long order = varToInt(var, &ok);
 
       return (ok && (order == Qt::AscendingOrder));
     }
@@ -640,7 +655,7 @@ uniqueId(const QVariant &var) const
   bool ok;
 
   if      (type() == CQBaseModelType::INTEGER) {
-    long i = var.toInt(&ok);
+    long i = varToInt(var, &ok);
 
     if (ok)
       return valueSet_->ivals().id(i);
@@ -793,7 +808,7 @@ isOutlier(const QVariant &value) const
   bool ok;
 
   if      (type() == CQBaseModelType::INTEGER) {
-    long i = value.toInt(&ok);
+    long i = varToInt(value, &ok);
 
     return (ok && valueSet_->ivals().isOutlier(i));
   }
@@ -818,7 +833,7 @@ map(const QVariant &var) const
   bool ok;
 
   if      (type() == CQBaseModelType::INTEGER) {
-    long i = var.toInt(&ok);
+    long i = varToInt(var, &ok);
 
     if (ok)
       return valueSet_->ivals().map(i);
@@ -889,13 +904,13 @@ initData()
       details_->addValue(var);
 
       if      (details_->type() == CQBaseModelType::INTEGER) {
-        long i = var.toInt(&ok);
+        long i = varToInt(var, &ok);
         if (! ok) return State::SKIP;
 
         if (! details_->checkRow(int(i)))
           return State::SKIP;
 
-        details_->addInt((int) i);
+        details_->addInt(i);
 
         addInt(i);
       }
@@ -939,29 +954,29 @@ initData()
       if (visitMin_) {
         bool ok1;
 
-        long imin = min_.toInt(&ok1);
+        long imin = varToInt(min_, &ok1);
 
         imin = (! ok1 ? i : std::min(imin, i));
 
-        min_ = QVariant(int(imin));
+        min_ = CQModelUtil::intVariant(imin);
       }
 
       // if no type defined max, update max value
       if (visitMax_) {
         bool ok1;
 
-        long imax = max_.toInt(&ok1);
+        long imax = varToInt(max_, &ok1);
 
         imax = (! ok1 ? i : std::max(imax, i));
 
-        max_ = QVariant(int(imax));
+        max_ = CQModelUtil::intVariant(imax);
       }
 
       if (lastValue1_.isValid() && lastValue2_.isValid()) {
         bool ok1, ok2;
 
-        long i1 = lastValue1_.toInt(&ok1);
-        long i2 = lastValue2_.toInt(&ok2);
+        long i1 = varToInt(lastValue1_, &ok1);
+        long i2 = varToInt(lastValue2_, &ok2);
 
         if (! monotonicSet_) {
           if (i1 != i2) {
@@ -984,7 +999,7 @@ initData()
       }
 
       lastValue1_ = lastValue2_;
-      lastValue2_ = int(i);
+      lastValue2_ = CQModelUtil::intVariant(i);
     }
 
     void addReal(double r) {
@@ -1037,7 +1052,7 @@ initData()
       }
 
       lastValue1_ = lastValue2_;
-      lastValue2_ = r;
+      lastValue2_ = CQModelUtil::realVariant(r);
     }
 
     void addString(const QString &s) {
@@ -1088,7 +1103,7 @@ initData()
       }
 
       lastValue1_ = lastValue2_;
-      lastValue2_ = s;
+      lastValue2_ = QVariant(s);
     }
 
     QVariant minValue() const { return min_; }
@@ -1189,7 +1204,7 @@ calcType()
 
 void
 CQModelColumnDetails::
-addInt(int i)
+addInt(long i)
 {
   valueSet_->ivals().addValue(i);
 }

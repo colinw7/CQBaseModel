@@ -73,6 +73,16 @@ int nameToRole(const QString &name);
 //! string to model index
 bool stringToRowCol(const QString &name, int &row, int &col);
 
+//---
+
+int roleCast(const CQBaseModelRole &role);
+int typeCast(const CQBaseModelType &type);
+
+//---
+
+QVariant intVariant(long l);
+QVariant realVariant(double r);
+
 }
 
 #endif

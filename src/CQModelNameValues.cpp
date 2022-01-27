@@ -125,7 +125,7 @@ nameValueString(const QString &name, QString &value, bool &ok) const
 
 bool
 CQModelNameValues::
-nameValueInteger(const QString &name, int &value, bool &ok) const
+nameValueInteger(const QString &name, long &value, bool &ok) const
 {
   ok = true;
 
@@ -133,6 +133,11 @@ nameValueInteger(const QString &name, int &value, bool &ok) const
 
   if (! nameValue(name, var))
     return false;
+
+  if (var.type() == QVariant::LongLong) {
+    value = var.value<qlonglong>();
+    return true;
+  }
 
   value = var.toInt(&ok);
 

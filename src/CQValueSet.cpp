@@ -64,10 +64,15 @@ int
 CQValueSet::
 iset(const QVariant &value) const
 {
-  bool ok;
+  bool ok = true;
 
   if      (type() == Type::INTEGER) {
-    int i = value.toInt(&ok);
+    long i;
+
+    if (value.type() == QVariant::LongLong)
+      i = value.value<qlonglong>();
+    else
+      i = value.toInt(&ok);
 
     if (ok)
       return ivals_.id(i);
@@ -421,11 +426,16 @@ init()
 
   clearVals();
 
-  bool ok;
+  bool ok = true;
 
   for (const auto &value : values_) {
     if      (type() == Type::INTEGER) {
-      int i = value.toInt(&ok);
+      long i = 0;
+
+      if (value.type() == QVariant::LongLong)
+        i = value.value<qlonglong>();
+      else
+        i = value.toInt(&ok);
 
       ivals_.addValue(ok ? OptInt(i) : OptInt());
     }

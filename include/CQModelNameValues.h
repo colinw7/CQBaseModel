@@ -46,7 +46,7 @@ class CQModelNameValues {
   // get named value. Returns true if name found, ok is false if found and value invalid
   bool nameValueString (const QString &name, QString &value, bool &ok) const;
 
-  virtual bool nameValueInteger(const QString &name, int &value, bool &ok) const;
+  virtual bool nameValueInteger(const QString &name, long &value, bool &ok) const;
   virtual bool nameValueReal   (const QString &name, double &value, bool &ok) const;
   virtual bool nameValueBool   (const QString &name, bool &value, bool &ok) const;
   virtual bool nameValueColor  (const QString &name, QColor &color, bool &ok) const;

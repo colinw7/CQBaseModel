@@ -176,7 +176,7 @@ class CQModelColumnDetails {
   void initType() const;
   bool calcType();
 
-  void addInt   (int i);
+  void addInt   (long i);
   void addReal  (double r);
   void addString(const QString &s);
 

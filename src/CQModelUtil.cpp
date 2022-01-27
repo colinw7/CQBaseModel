@@ -4,6 +4,20 @@
 
 namespace CQModelUtil {
 
+int
+roleCast(const CQBaseModelRole &role)
+{
+  return static_cast<int>(role);
+}
+
+int
+typeCast(const CQBaseModelType &type)
+{
+  return static_cast<int>(type);
+}
+
+//------
+
 bool
 isHierarchical(const QAbstractItemModel *model)
 {
@@ -48,7 +62,7 @@ QVariant
 modelHeaderValue(const QAbstractItemModel *model, int c, Qt::Orientation orientation,
                  CQBaseModelRole role, bool &ok)
 {
-  return modelHeaderValue(model, c, orientation, (int) role, ok);
+  return modelHeaderValue(model, c, orientation, roleCast(role), ok);
 }
 
 QVariant
@@ -60,7 +74,7 @@ modelHeaderValue(const QAbstractItemModel *model, int c, int role, bool &ok)
 QVariant
 modelHeaderValue(const QAbstractItemModel *model, int c, CQBaseModelRole role, bool &ok)
 {
-  return modelHeaderValue(model, c, (int) role, ok);
+  return modelHeaderValue(model, c, roleCast(role), ok);
 }
 
 QString
@@ -135,8 +149,12 @@ modelInteger(const QAbstractItemModel *model, const QModelIndex &ind, bool &ok)
 
   long i = 0;
 
-  if (ok)
-    i = var.toInt(&ok);
+  if (ok) {
+    if (var.type() == QVariant::LongLong)
+      i = var.value<qlonglong>();
+    else
+      i = var.toInt(&ok);
+  }
 
   return i;
 }
@@ -161,7 +179,7 @@ columnValueType(const QAbstractItemModel *model, int c, CQBaseModelType &type)
 {
   type = CQBaseModelType::STRING;
 
-  auto var = model->headerData(c, Qt::Horizontal, (int) CQBaseModelRole::Type);
+  auto var = model->headerData(c, Qt::Horizontal, roleCast(CQBaseModelRole::Type));
   if (! var.isValid()) return false;
 
   bool ok;
@@ -309,34 +327,34 @@ nameToRole(const QString &name)
   else if (name == "decoration"    ) return Qt::DecorationRole;
 
   // custom
-  else if (name == "type"              ) return (int) CQBaseModelRole::Type;
-  else if (name == "base_type"         ) return (int) CQBaseModelRole::BaseType;
-  else if (name == "type_values"       ) return (int) CQBaseModelRole::TypeValues;
-  else if (name == "min"               ) return (int) CQBaseModelRole::Min;
-  else if (name == "max"               ) return (int) CQBaseModelRole::Max;
-  else if (name == "sorted"            ) return (int) CQBaseModelRole::Sorted;
-  else if (name == "sort_order"        ) return (int) CQBaseModelRole::SortOrder;
-  else if (name == "title"             ) return (int) CQBaseModelRole::Title;
-  else if (name == "tip"               ) return (int) CQBaseModelRole::Tip;
-  else if (name == "key"               ) return (int) CQBaseModelRole::Key;
-  else if (name == "raw_value"         ) return (int) CQBaseModelRole::RawValue;
-  else if (name == "intermediate_value") return (int) CQBaseModelRole::IntermediateValue;
-  else if (name == "cached_value"      ) return (int) CQBaseModelRole::CachedValue;
-  else if (name == "output_value"      ) return (int) CQBaseModelRole::OutputValue;
-  else if (name == "group"             ) return (int) CQBaseModelRole::Group;
-  else if (name == "format"            ) return (int) CQBaseModelRole::Format;
-  else if (name == "iformat"           ) return (int) CQBaseModelRole::IFormat;
-  else if (name == "oformat"           ) return (int) CQBaseModelRole::OFormat;
-  else if (name == "data_min"          ) return (int) CQBaseModelRole::DataMin;
-  else if (name == "data_max"          ) return (int) CQBaseModelRole::DataMax;
-  else if (name == "header_type"       ) return (int) CQBaseModelRole::HeaderType;
-  else if (name == "header_type_values") return (int) CQBaseModelRole::HeaderTypeValues;
-  else if (name == "fill_color"        ) return (int) CQBaseModelRole::FillColor;
-  else if (name == "symbol_type"       ) return (int) CQBaseModelRole::SymbolType;
-  else if (name == "symbol_size"       ) return (int) CQBaseModelRole::SymbolSize;
-  else if (name == "font_size"         ) return (int) CQBaseModelRole::FontSize;
-  else if (name == "style"             ) return (int) CQBaseModelRole::Style;
-  else if (name == "export"            ) return (int) CQBaseModelRole::Export;
+  else if (name == "type"              ) return roleCast(CQBaseModelRole::Type);
+  else if (name == "base_type"         ) return roleCast(CQBaseModelRole::BaseType);
+  else if (name == "type_values"       ) return roleCast(CQBaseModelRole::TypeValues);
+  else if (name == "min"               ) return roleCast(CQBaseModelRole::Min);
+  else if (name == "max"               ) return roleCast(CQBaseModelRole::Max);
+  else if (name == "sorted"            ) return roleCast(CQBaseModelRole::Sorted);
+  else if (name == "sort_order"        ) return roleCast(CQBaseModelRole::SortOrder);
+  else if (name == "title"             ) return roleCast(CQBaseModelRole::Title);
+  else if (name == "tip"               ) return roleCast(CQBaseModelRole::Tip);
+  else if (name == "key"               ) return roleCast(CQBaseModelRole::Key);
+  else if (name == "raw_value"         ) return roleCast(CQBaseModelRole::RawValue);
+  else if (name == "intermediate_value") return roleCast(CQBaseModelRole::IntermediateValue);
+  else if (name == "cached_value"      ) return roleCast(CQBaseModelRole::CachedValue);
+  else if (name == "output_value"      ) return roleCast(CQBaseModelRole::OutputValue);
+  else if (name == "group"             ) return roleCast(CQBaseModelRole::Group);
+  else if (name == "format"            ) return roleCast(CQBaseModelRole::Format);
+  else if (name == "iformat"           ) return roleCast(CQBaseModelRole::IFormat);
+  else if (name == "oformat"           ) return roleCast(CQBaseModelRole::OFormat);
+  else if (name == "data_min"          ) return roleCast(CQBaseModelRole::DataMin);
+  else if (name == "data_max"          ) return roleCast(CQBaseModelRole::DataMax);
+  else if (name == "header_type"       ) return roleCast(CQBaseModelRole::HeaderType);
+  else if (name == "header_type_values") return roleCast(CQBaseModelRole::HeaderTypeValues);
+  else if (name == "fill_color"        ) return roleCast(CQBaseModelRole::FillColor);
+  else if (name == "symbol_type"       ) return roleCast(CQBaseModelRole::SymbolType);
+  else if (name == "symbol_size"       ) return roleCast(CQBaseModelRole::SymbolSize);
+  else if (name == "font_size"         ) return roleCast(CQBaseModelRole::FontSize);
+  else if (name == "style"             ) return roleCast(CQBaseModelRole::Style);
+  else if (name == "export"            ) return roleCast(CQBaseModelRole::Export);
 
   bool ok;
 
@@ -368,6 +386,20 @@ stringToRowCol(const QString &str, int &row, int &col)
     return false;
 
   return true;
+}
+
+//---
+
+QVariant
+intVariant(long l)
+{
+  return QVariant((qlonglong) l);
+}
+
+QVariant
+realVariant(double r)
+{
+  return QVariant(r);
 }
 
 }
