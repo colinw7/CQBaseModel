@@ -75,7 +75,7 @@ class CQBaseModel : public QAbstractItemModel {
   const DataType &dataType() const { return dataType_; }
   void setDataType(const DataType &t) { dataType_ = t; }
 
-  void setDataType(const CQBaseModelDataType &t) { dataType_ = (DataType) t; }
+  void setDataType(const CQBaseModelDataType &t) { dataType_ = static_cast<DataType>(t); }
 
   //---
 

@@ -832,7 +832,7 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
       return setColumnSorted(section, value.toBool());
     }
     else if (role == static_cast<int>(CQBaseModelRole::SortOrder)) {
-      return setColumnSortOrder(section, (Qt::SortOrder) value.toInt());
+      return setColumnSortOrder(section, static_cast<Qt::SortOrder>(value.toInt()));
     }
     else if (role == static_cast<int>(CQBaseModelRole::Title)) {
       return setColumnTitle(section, value.toString());
@@ -963,7 +963,7 @@ variantToType(const QVariant &var, bool *ok)
   auto type = CQBaseModelType::NONE;
 
   if (var.type() == QVariant::Int) {
-    type = (CQBaseModelType) var.toInt(ok);
+    type = static_cast<CQBaseModelType>(var.toInt(ok));
   }
   else {
     auto str = var.toString();
@@ -1050,7 +1050,7 @@ isType(int type)
 {
   initTypes();
 
-  return (s_typeName.find((CQBaseModelType) type) != s_typeName.end());
+  return (s_typeName.find(static_cast<CQBaseModelType>(type)) != s_typeName.end());
 }
 
 QString
