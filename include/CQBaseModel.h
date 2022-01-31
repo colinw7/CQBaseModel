@@ -200,9 +200,6 @@ class CQBaseModel : public QAbstractItemModel {
   //! convert string to integer
   static long toInt(const QString &str, bool &ok);
 
-  //! is real representable (exactly) as integer
-  static bool isInteger(double r);
-
  signals:
   //! signals when data changed
   void columnTypeChanged      (int column);

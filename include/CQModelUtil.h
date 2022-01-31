@@ -4,6 +4,8 @@
 #include <CQBaseModelTypes.h>
 #include <QAbstractItemModel>
 
+class QColor;
+
 namespace CQModelUtil {
 
 //! is model hierarchical (row has children)
@@ -80,8 +82,28 @@ int typeCast(const CQBaseModelType &type);
 
 //---
 
+// create variant from int (long)
 QVariant intVariant(long l);
+// create variant from real (double)
 QVariant realVariant(double r);
+// create variant from string (QString)
+QVariant stringVariant(const QString &s);
+// create variant from bool
+QVariant boolVariant(bool b);
+
+// create variant from color (QColor)
+QVariant colorVariant(const QColor &c);
+
+// create empty variant
+QVariant nullVariant();
+
+// create variant for NaN real value
+QVariant nanVariant();
+
+//---
+
+//! is real representable (exactly) as integer
+bool isInteger(double r);
 
 }
 

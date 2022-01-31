@@ -1,4 +1,5 @@
 #include <CQValueSet.h>
+#include <CQModelUtil.h>
 #include <CQTrie.h>
 
 CQValueSet::
@@ -481,7 +482,7 @@ calcType() const
 
       double r = value.toDouble(&ok);
 
-      if (CMathUtil::isInteger(r))
+      if (CQModelUtil::isInteger(r))
         ++ni;
       else
         ++nr;
@@ -492,7 +493,7 @@ calcType() const
       double r = value.toDouble(&ok);
 
       if (ok) {
-        if (CMathUtil::isInteger(r))
+        if (CQModelUtil::isInteger(r))
           ++ni;
         else
           ++nr;

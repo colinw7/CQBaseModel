@@ -1,6 +1,10 @@
 #include <CQModelUtil.h>
 #include <CQModelVisitor.h>
+
+#include <CMathUtil.h>
+
 #include <QSortFilterProxyModel>
+#include <QColor>
 
 namespace CQModelUtil {
 
@@ -183,7 +187,7 @@ columnValueType(const QAbstractItemModel *model, int c, CQBaseModelType &type)
   if (! var.isValid()) return false;
 
   bool ok;
-  type = (CQBaseModelType) var.toInt(&ok);
+  type = static_cast<CQBaseModelType>(var.toInt(&ok));
   if (! ok) return false;
 
   return true;
@@ -393,13 +397,51 @@ stringToRowCol(const QString &str, int &row, int &col)
 QVariant
 intVariant(long l)
 {
-  return QVariant((qlonglong) l);
+  return QVariant(static_cast<qlonglong>(l));
 }
 
 QVariant
 realVariant(double r)
 {
   return QVariant(r);
+}
+
+QVariant
+stringVariant(const QString &s)
+{
+  return QVariant(s);
+}
+
+QVariant
+boolVariant(bool b)
+{
+  return QVariant(b);
+}
+
+QVariant
+colorVariant(const QColor &c)
+{
+  return QVariant(c);
+}
+
+QVariant
+nullVariant()
+{
+  return QVariant();
+}
+
+QVariant
+nanVariant()
+{
+  return realVariant(CMathUtil::getNaN());
+}
+
+//---
+
+bool
+isInteger(double r)
+{
+  return CMathUtil::isLong(r);
 }
 
 }

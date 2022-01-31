@@ -1101,10 +1101,3 @@ toInt(const QString &str, bool &ok)
 {
   return str.toInt(&ok);
 }
-
-bool
-CQBaseModel::
-isInteger(double r)
-{
-  return CMathUtil::isInteger(r);
-}
