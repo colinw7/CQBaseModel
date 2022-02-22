@@ -424,11 +424,13 @@ colorVariant(const QColor &c)
   return QVariant(c);
 }
 
+#if 0
 QVariant
 nullVariant()
 {
   return QVariant();
 }
+#endif
 
 QVariant
 nanVariant()

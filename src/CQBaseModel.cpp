@@ -962,9 +962,10 @@ variantToType(const QVariant &var, bool *ok)
 {
   auto type = CQBaseModelType::NONE;
 
-  if (var.type() == QVariant::Int) {
+  if      (var.type() == QVariant::Int)
     type = static_cast<CQBaseModelType>(var.toInt(ok));
-  }
+  else if (var.type() == QVariant::LongLong)
+    type = static_cast<CQBaseModelType>(var.toLongLong(ok));
   else {
     auto str = var.toString();
 
@@ -993,7 +994,8 @@ isSameType(const QVariant &var, CQBaseModelType type)
   if (type == CQBaseModelType::REAL && var.type() == QVariant::Double)
     return true;
 
-  if (type == CQBaseModelType::INTEGER && var.type() == QVariant::Int)
+  if (type == CQBaseModelType::INTEGER &&
+      (var.type() == QVariant::Int || var.type() == QVariant::LongLong))
     return true;
 
 #if 0

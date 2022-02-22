@@ -37,22 +37,24 @@ init(int numCols, int numRows)
   setObjectName("dataModel");
 
   if (numCols > 0 && numRows > 0)
-    init1(numCols, numRows);
+    init1(size_t(numCols), size_t(numRows));
 
   connect(this, SIGNAL(columnTypeChanged(int)), this, SLOT(resetColumnCache(int)));
 }
 
 void
 CQDataModel::
-init1(int numCols, int numRows)
+init1(size_t numCols, size_t numRows)
 {
   hheader_.resize(numCols);
   vheader_.resize(numRows);
 
   data_.resize(numRows);
 
-  for (int i = 0; i < numRows; ++i)
+  for (size_t i = 0; i < numRows; ++i)
     data_[i].resize(numCols);
+
+  clearCachedColumn();
 }
 
 void
@@ -68,6 +70,8 @@ copyModel(CQDataModel *model)
 
   CQBaseModel::copyModel(model);
 
+  clearCachedColumn();
+
   endResetModel();
 }
 
@@ -77,7 +81,8 @@ resizeModel(int numCols, int numRows)
 {
   beginResetModel();
 
-  init1(numCols, numRows);
+  if (numCols > 0 && numRows > 0)
+    init1(size_t(numCols), size_t(numRows));
 
   endResetModel();
 }
@@ -94,10 +99,12 @@ addRow(int n)
   for (int i = 0; i < n; ++i) {
     Cells row;
 
-    row.resize(columnCount());
+    row.resize(size_t(columnCount()));
 
     data_.push_back(row);
   }
+
+  clearCachedColumn();
 
   endResetModel();
 }
@@ -108,16 +115,18 @@ addColumn(int n)
 {
   beginResetModel();
 
-  int nr = rowCount();
+  auto nr = rowCount();
 
   hheader_.push_back("");
 
-  for (int ir = 0; ir < nr; ++ir) {
+  for (size_t ir = 0; ir < size_t(nr); ++ir) {
     auto &row = data_[ir];
 
     for (int i = 0; i < n; ++i)
       row.push_back("");
   }
+
+  clearCachedColumn();
 
   endResetModel();
 }
@@ -139,7 +148,7 @@ initFilter()
 
   //---
 
-  int numHeaders = hheader_.size();
+  auto numHeaders = hheader_.size();
 
   auto patterns = filter_.split(",");
 
@@ -154,9 +163,9 @@ initFilter()
 
       filterData.column = -1;
 
-      for (int j = 0; j < numHeaders; ++j) {
+      for (size_t j = 0; j < numHeaders; ++j) {
         if (hheader_[j] == name) {
-          filterData.column = j;
+          filterData.column = int(j);
           break;
         }
       }
@@ -177,7 +186,7 @@ initFilter()
       filterData.regexp = QRegExp(patterns[i], Qt::CaseSensitive, QRegExp::Wildcard);
     }
 
-    filterData.valid = (filterData.column >= 0 && filterData.column < numHeaders);
+    filterData.valid = (filterData.column >= 0 && filterData.column < int(numHeaders));
 
     filterDatas_.push_back(filterData);
   }
@@ -210,7 +219,7 @@ acceptsRow(const Cells &cells) const
     if (! filterData.valid)
       continue;
 
-    auto field = cells[filterData.column].toString();
+    auto field = cells[size_t(filterData.column)].toString();
 
     if (! filterData.regexp.exactMatch(field))
       return false;
@@ -225,7 +234,7 @@ int
 CQDataModel::
 columnCount(const QModelIndex &) const
 {
-  return hheader_.size();
+  return int(hheader_.size());
 }
 
 int
@@ -235,13 +244,18 @@ rowCount(const QModelIndex &parent) const
   if (parent.isValid())
     return 0;
 
-  return data_.size();
+  return int(data_.size());
 }
 
 QVariant
 CQDataModel::
 headerData(int section, Qt::Orientation orientation, int role) const
 {
+  if (section < 0)
+    return QVariant();
+
+  auto section1 = size_t(section);
+
   if (orientation == Qt::Horizontal) {
     if (hheader_.empty())
       return CQBaseModel::headerData(section, orientation, role);
@@ -252,19 +266,19 @@ headerData(int section, Qt::Orientation orientation, int role) const
       return QVariant();
 
     if      (role == Qt::DisplayRole) {
-      if (hheader_[section].toString().length())
-        return hheader_[section];
+      if (hheader_[section1].toString().length())
+        return hheader_[section1];
 
       return CQBaseModel::headerData(section, orientation, role);
     }
     else if (role == Qt::EditRole) {
-      if (hheader_[section].toString().length())
-        return hheader_[section];
+      if (hheader_[section1].toString().length())
+        return hheader_[section1];
 
       return CQBaseModel::headerData(section, orientation, role);
     }
     else if (role == Qt::ToolTipRole) {
-      auto var = hheader_[section];
+      auto var = hheader_[section1];
 
       auto type = columnType(section);
 
@@ -296,19 +310,19 @@ headerData(int section, Qt::Orientation orientation, int role) const
       return QVariant();
 
     if      (role == Qt::DisplayRole) {
-      if (vheader_[section].toString().length())
-        return vheader_[section];
+      if (vheader_[section1].toString().length())
+        return vheader_[section1];
       else
         return CQBaseModel::headerData(section, orientation, role);
     }
     else if (role == Qt::EditRole) {
-      if (vheader_[section].toString().length())
-        return vheader_[section];
+      if (vheader_[section1].toString().length())
+        return vheader_[section1];
       else
         return CQBaseModel::headerData(section, orientation, role);
     }
     else if (role == Qt::ToolTipRole) {
-      return vheader_[section];
+      return vheader_[section1];
     }
     else {
       return CQBaseModel::headerData(section, orientation, role);
@@ -320,6 +334,11 @@ bool
 CQDataModel::
 setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
 {
+  if (section < 0)
+    return false;
+
+  auto section1 = size_t(section);
+
   if (orientation == Qt::Horizontal) {
     if (hheader_.empty())
       return CQBaseModel::setHeaderData(section, orientation, value, role);
@@ -330,7 +349,7 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
       return false;
 
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
-      hheader_[section] = value;
+      hheader_[section1] = value;
 
       emit headerDataChanged(orientation, section, section);
 
@@ -350,7 +369,7 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
       return false;
 
     if (role == Qt::DisplayRole) {
-      vheader_[section] = value;
+      vheader_[section1] = value;
 
       emit headerDataChanged(orientation, section, section);
 
@@ -372,12 +391,12 @@ data(const QModelIndex &index, int role) const
   int r = index.row();
   int c = index.column();
 
-  int nr = data_.size();
+  auto nr = data_.size();
 
-  if (r < 0 || r >= nr)
+  if (r < 0 || size_t(r) >= nr)
     return QVariant();
 
-  const Cells &cells = data_[r];
+  const Cells &cells = data_[size_t(r)];
 
   auto nc = cells.size();
 
@@ -417,7 +436,7 @@ data(const QModelIndex &index, int role) const
   //---
 
   if      (role == Qt::DisplayRole) {
-    return cells[c];
+    return cells[size_t(c)];
   }
   else if (role == Qt::EditRole) {
     auto type = columnType(c);
@@ -431,7 +450,7 @@ data(const QModelIndex &index, int role) const
     }
 
     // not cached so get raw value
-    var = cells[c];
+    var = cells[size_t(c)];
 
     // column has no type or already correct type then just return
     if (type == CQBaseModelType::NONE || isSameType(var, type))
@@ -450,7 +469,7 @@ data(const QModelIndex &index, int role) const
     return var;
   }
   else if (role == Qt::ToolTipRole) {
-    return cells[c];
+    return cells[size_t(c)];
   }
   else if (role == CQModelUtil::roleCast(CQBaseModelRole::RawValue) ||
            role == CQModelUtil::roleCast(CQBaseModelRole::IntermediateValue) ||
@@ -462,7 +481,7 @@ data(const QModelIndex &index, int role) const
       return var;
 
     if (role == CQModelUtil::roleCast(CQBaseModelRole::RawValue)) {
-      return cells[c];
+      return cells[size_t(c)];
     }
 
     return QVariant();
@@ -492,18 +511,22 @@ setData(const QModelIndex &index, const QVariant &value, int role)
   int r = index.row();
   int c = index.column();
 
-  int nr = data_.size();
+  auto nr = data_.size();
 
-  if (r >= nr)
+  if (r < 0 || size_t(r) >= nr)
     return false;
 
-  Cells &cells = data_[r];
+  Cells &cells = data_[size_t(r)];
 
 //auto nc = cells.size();
   auto nc = columnCount();
 
   if (c < 0 || c >= nc)
     return false;
+
+  //---
+
+  clearCachedColumn();
 
   //---
 
@@ -538,7 +561,7 @@ setData(const QModelIndex &index, const QVariant &value, int role)
   if      (role == Qt::DisplayRole) {
     //auto type = columnType(c);
 
-    cells[c] = value;
+    cells[size_t(c)] = value;
 
     emit dataChanged(index, index, QVector<int>(1, role));
   }
@@ -548,7 +571,7 @@ setData(const QModelIndex &index, const QVariant &value, int role)
     while (size_t(c) >= cells.size())
       cells.push_back(QVariant());
 
-    cells[c] = value;
+    cells[size_t(c)] = value;
 
     clearRowRoleValue(r, CQModelUtil::roleCast(CQBaseModelRole::RawValue));
     clearRowRoleValue(r, CQModelUtil::roleCast(CQBaseModelRole::IntermediateValue));
@@ -646,7 +669,7 @@ applyFilterColumns(const QStringList &columns)
 
   std::map<int, int> columnMap;
 
-  int nc1 = hheader_.size();
+  int nc1 = int(hheader_.size());
   int nc2 = columns.length();
 
   for (int c = 0; c < nc1; ++c)
@@ -659,7 +682,7 @@ applyFilterColumns(const QStringList &columns)
     int ind = -1;
 
     for (int c1 = 0; c1 < nc1; ++c1) {
-      if (hheader[c1] == name) {
+      if (hheader[size_t(c1)] == name) {
         ind = c1;
         break;
       }
@@ -694,15 +717,15 @@ applyFilterColumns(const QStringList &columns)
   }
 
   // remap horizontal header and row data
-  hheader_.clear(); hheader_.resize(nc2);
+  hheader_.clear(); hheader_.resize(size_t(nc2));
 
-  int nr = data.size();
+  auto nr = data.size();
 
-  for (int r = 0; r < nr; ++r) {
+  for (size_t r = 0; r < nr; ++r) {
     Cells &cells1 = data [r]; // old data
     Cells &cells2 = data_[r]; // new data
 
-    cells2.clear(); cells2.resize(nc2);
+    cells2.clear(); cells2.resize(size_t(nc2));
 
     for (int c = 0; c < nc1; ++c) {
       int c1 = columnMap[c];
@@ -710,8 +733,64 @@ applyFilterColumns(const QStringList &columns)
       if (c1 < 0 || c1 >= nc1)
         continue;
 
-      hheader_[c1] = hheader[c];
-      cells2  [c1] = cells1 [c];
+      hheader_[size_t(c1)] = hheader[size_t(c)];
+      cells2  [size_t(c1)] = cells1 [size_t(c)];
     }
   }
+}
+
+//---
+
+int
+CQDataModel::
+findColumnValue(int column, const QVariant &var) const
+{
+  updateColumnValues(column);
+
+  int nr = cachedColumnVars_.size();
+
+  for (int r = 0; r < nr; ++r) {
+    if (cachedColumnVars_[r] == var)
+      return r;
+  }
+
+  return -1;
+}
+
+void
+CQDataModel::
+getColumnValues(int column, QVariantList &vars) const
+{
+  updateColumnValues(column);
+
+  vars = cachedColumnVars_;
+}
+
+void
+CQDataModel::
+updateColumnValues(int column) const
+{
+  if (column != cachedColumn_) {
+    cachedColumn_ = column;
+
+    cachedColumnVars_.clear();
+
+    int nr = rowCount();
+
+    for (int r = 0; r < nr; ++r) {
+      auto ind = index(r, column, QModelIndex());
+
+      auto var = data(ind, Qt::DisplayRole);
+
+      cachedColumnVars_.push_back(var);
+    }
+  }
+}
+
+void
+CQDataModel::
+clearCachedColumn()
+{
+  cachedColumn_ = -1;
+  cachedColumnVars_.clear();
 }

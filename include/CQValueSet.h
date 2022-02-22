@@ -4,6 +4,7 @@
 #include <CQStatData.h>
 #include <CQBaseModelTypes.h>
 #include <CMathUtil.h>
+#include <CSafeIndex.h>
 
 #include <vector>
 #include <set>
@@ -43,10 +44,10 @@ class CQRValues {
 
   bool canMap() const { return ! valset_.empty(); }
 
-  int size() const { return values_.size(); }
+  int size() const { return int(values_.size()); }
 
   // get nth value (non-unique)
-  const OptReal &value(int i) const { return values_[i]; }
+  const OptReal &value(int i) const { return CUtil::safeIndex(values_, i); }
 
   int addValue(const OptReal &r);
 
@@ -99,7 +100,7 @@ class CQRValues {
   int imax(int def=0) const { return (setvals_.empty() ? def : setvals_.rbegin()->first); }
 
   // number of unique values
-  int numUnique() const { return valset_.size(); }
+  int numUnique() const { return int(valset_.size()); }
 
   void uniqueValues(Values &values) {
     for (const auto &vi : valset_)
@@ -126,7 +127,7 @@ class CQRValues {
 
   bool isOutlier(double i) const;
 
-  double svalue(int i) const { return svalues_[i]; }
+  double svalue(int i) const { return CUtil::safeIndex(svalues_, i); }
 
  private:
   void initCalc() const {
@@ -179,8 +180,8 @@ class CQRValues {
  */
 class CQIValues {
  public:
-  using OptInt  = boost::optional<int>;
-  using Values  = std::vector<double>;
+  using OptInt  = boost::optional<long>;
+  using Values  = std::vector<long>;
   using Counts  = std::vector<int>;
   using Indices = std::vector<int>;
 
@@ -201,17 +202,17 @@ class CQIValues {
 
   bool canMap() const { return ! valset_.empty(); }
 
-  int size() const { return values_.size(); }
+  int size() const { return int(values_.size()); }
 
   // get nth value (non-unique)
-  const OptInt &value(int i) const { return values_[i]; }
+  const OptInt &value(int i) const { return CUtil::safeIndex(values_, i); }
 
   int addValue(const OptInt &i);
 
   int numNull() const { return numNull_; }
 
   // integer to id
-  int id(int i) const {
+  int id(long i) const {
     // get integer set index
     auto p = valset_.find(i);
 
@@ -222,7 +223,7 @@ class CQIValues {
   }
 
   // id to integer
-  int ivalue(int i) const {
+  long ivalue(int i) const {
     // get integer for index
     auto p = setvals_.find(i);
 
@@ -233,27 +234,27 @@ class CQIValues {
   }
 
   // map value into real in range
-  double map(int i, double mapMin=0.0, double mapMax=1.0) const {
+  double map(long i, double mapMin=0.0, double mapMax=1.0) const {
     // map value using real value range
-    double imin = this->min();
-    double imax = this->max();
+    double imin = double(this->min());
+    double imax = double(this->max());
 
     if (imin == imax)
       return mapMin;
 
-    return CMathUtil::map(i, imin, imax, mapMin, mapMax);
+    return CMathUtil::map(double(i), imin, imax, mapMin, mapMax);
   }
 
   // min/max value
-  int min(int def=0) const { return (valset_.empty() ? def : valset_. begin()->first); }
-  int max(int def=0) const { return (valset_.empty() ? def : valset_.rbegin()->first); }
+  long min(long def=0) const { return (valset_.empty() ? def : valset_. begin()->first); }
+  long max(long def=0) const { return (valset_.empty() ? def : valset_.rbegin()->first); }
 
   // min/max index
   int imin(int def=0) const { return (setvals_.empty() ? def : setvals_. begin()->first); }
   int imax(int def=0) const { return (setvals_.empty() ? def : setvals_.rbegin()->first); }
 
   // number of unique values
-  int numUnique() const { return valset_.size(); }
+  int numUnique() const { return int(valset_.size()); }
 
   void uniqueValues(Values &values) {
     for (const auto &vi : valset_)
@@ -278,9 +279,9 @@ class CQIValues {
 
   const Indices &outliers() const { initCalc(); return outliers_; }
 
-  bool isOutlier(int v) const;
+  bool isOutlier(long v) const;
 
-  double svalue(int i) const { return svalues_[i]; }
+  long svalue(int i) const { return CUtil::safeIndex(svalues_, i); }
 
  private:
   void initCalc() const {
@@ -302,8 +303,8 @@ class CQIValues {
  private:
   using OptValues = std::vector<OptInt>;
   using KeyCount  = std::pair<int, int>;
-  using ValueSet  = std::map<int, KeyCount>;
-  using SetValues = std::map<int, int>;
+  using ValueSet  = std::map<long, KeyCount>;
+  using SetValues = std::map<int, long>;
 
   OptValues                 values_;               //!< all integer values
   Values                    svalues_;              //!< sorted integer values
@@ -338,10 +339,10 @@ class CQSValues {
 
   bool canMap() const { return ! valset_.empty(); }
 
-  int size() const { return values_.size(); }
+  int size() const { return int(values_.size()); }
 
   // get nth value (non-unique)
-  const OptString &value(int i) const { return values_[i]; }
+  const OptString &value(int i) const { return CUtil::safeIndex(values_, i); }
 
   int addValue(const OptString &s);
 
@@ -382,7 +383,7 @@ class CQSValues {
   int imax(int def=0) const { return (setvals_.empty() ? def : setvals_.rbegin()->first); }
 
   // number of unique values
-  int numUnique() const { return valset_.size(); }
+  int numUnique() const { return int(valset_.size()); }
 
   void uniqueValues(Values &values) {
     for (const auto &sv : setvals_)
@@ -452,7 +453,7 @@ class CQValueSet : public QObject {
 
  public:
   using Type      = CQBaseModelType;
-  using OptInt    = boost::optional<int>;
+  using OptInt    = boost::optional<long>;
   using OptReal   = boost::optional<double>;
   using OptString = boost::optional<QString>;
 
@@ -486,9 +487,9 @@ class CQValueSet : public QObject {
 
   void addValue(const QVariant &value);
 
-  int numValues() const { return values_.size(); }
+  int numValues() const { return int(values_.size()); }
 
-  const QVariant &value(int i) const { return values_[i]; }
+  const QVariant &value(int i) const { return CUtil::safeIndex(values_, i); }
 
   void clear();
 
@@ -584,11 +585,15 @@ class CQValueSet : public QObject {
   // (for integers and reals this is the mean value, otherwise this is imax/2)
   double rmean() const;
 
-  int    rid(double r) const;
+  // index for real value
+  int rid(double r) const;
+  // real value for index
   double idr(int i) const;
 
-  int iid(int i) const;
-  int idi(int i) const;
+  // index for integer value
+  int iid(long i) const;
+  // integer value for index
+  long idi(int i) const;
 
  private:
   void init() const;

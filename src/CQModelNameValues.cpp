@@ -4,6 +4,7 @@
 #include <QColor>
 #include <QFont>
 
+// <name>=<value>,...
 QString
 CQModelNameValues::
 toString(const NameValues &nameValues)
@@ -46,6 +47,7 @@ fromString(const QString &str)
   return true;
 }
 
+// <name>=<value>,...
 bool
 CQModelNameValues::
 fromString(const QString &str, NameValues &nameValues)

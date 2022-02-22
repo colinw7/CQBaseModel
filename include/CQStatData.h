@@ -51,7 +51,7 @@ struct CQStatData {
   void calcStatValues(const std::vector<T> &values) {
     set = true;
 
-    int nv = values.size();
+    int nv = int(values.size());
 
     if (nv > 0) {
       // calc median
@@ -59,7 +59,7 @@ struct CQStatData {
 
       medianInd(0, nv - 1, nv1, nv2);
 
-      median = (values[nv1] + values[nv2])/2.0;
+      median = double(values[size_t(nv1)] + values[size_t(nv2)])/2.0;
 
       // calc lower median
       if (nv1 > 0) {
@@ -67,10 +67,10 @@ struct CQStatData {
 
         medianInd(0, nv1 - 1, nl1, nl2);
 
-        lowerMedian = (values[nl1] + values[nl2])/2.0;
+        lowerMedian = double(values[size_t(nl1)] + values[size_t(nl2)])/2.0;
       }
       else
-        lowerMedian = values[0];
+        lowerMedian = double(values[0]);
 
       // calc upper median
       if (nv2 < nv - 1) {
@@ -78,10 +78,10 @@ struct CQStatData {
 
         medianInd(nv2 + 1, nv - 1, nu1, nu2);
 
-        upperMedian = (values[nu1] + values[nu2])/2.0;
+        upperMedian = double(values[size_t(nu1)] + values[size_t(nu2)])/2.0;
       }
       else
-        upperMedian = values[nv - 1];
+        upperMedian = double(values[size_t(nv - 1)]);
 
       //---
 
@@ -103,7 +103,7 @@ struct CQStatData {
         min = std::min(double(v), min);
         max = std::max(double(v), max);
 
-        sum += v;
+        sum += double(v);
       }
 
       mean = sum/nv;
@@ -114,7 +114,7 @@ struct CQStatData {
       double sum2 = 0.0;
 
       for (auto v : values) {
-        double dr = v - mean;
+        double dr = double(v) - mean;
 
         sum2 += dr*dr;
       }

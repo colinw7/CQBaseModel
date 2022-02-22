@@ -148,7 +148,7 @@ imap(int i, double mapMin, double mapMax) const
 
     // return actual value if mapping disabled
     if (! isMapped())
-      return *ival;
+      return double(*ival);
 
 #if 0
     // map value using integer value range
@@ -290,11 +290,11 @@ CQValueSet::
 rmin(double def) const
 {
   if      (type() == Type::INTEGER)
-    return ivals_.min(def);
+    return double(ivals_.min(long(def)));
   else if (type() == Type::REAL)
     return rvals_.min(def);
   else if (type() == Type::STRING)
-    return svals_.imin(def);
+    return svals_.imin(int(def));
   else
     return def;
 }
@@ -304,11 +304,11 @@ CQValueSet::
 rmax(double def) const
 {
   if      (type() == Type::INTEGER)
-    return ivals_.max(def);
+    return double(ivals_.max(long(def)));
   else if (type() == Type::REAL)
     return rvals_.max(def);
   else if (type() == Type::STRING)
-    return svals_.imax(def);
+    return svals_.imax(int(def));
   else
     return def;
 }
@@ -318,7 +318,7 @@ CQValueSet::
 rsum() const
 {
   if      (type() == Type::INTEGER)
-    return ivals_.sum();
+    return double(ivals_.sum());
   else if (type() == Type::REAL)
     return rvals_.sum();
   else if (type() == Type::STRING)
@@ -371,7 +371,7 @@ idr(int i) const
 
 int
 CQValueSet::
-iid(int i) const
+iid(long i) const
 {
   if      (type() == Type::INTEGER)
     return ivals_.id(i);
@@ -383,7 +383,7 @@ iid(int i) const
     return -1;
 }
 
-int
+long
 CQValueSet::
 idi(int i) const
 {
@@ -473,7 +473,7 @@ calcType() const
   int ni = 0, nr = 0;
 
   for (const auto &value : values_) {
-    if      (value.type() == QVariant::Int)
+    if      (value.type() == QVariant::Int || value.type() == QVariant::LongLong)
       ++ni;
     else if (value.type() == QVariant::Double) {
       ++nr;
@@ -550,7 +550,7 @@ addValue(const OptReal &r)
   auto p = valset_.find(*r);
 
   if (p == valset_.end()) {
-    int id = valset_.size();
+    int id = int(valset_.size());
 
     p = valset_.insert(p, ValueSet::value_type(*r, KeyCount(id, 1))); // id for value
 
@@ -655,7 +655,7 @@ addValue(const OptInt &i)
   auto p = valset_.find(*i);
 
   if (p == valset_.end()) {
-    int id = valset_.size();
+    int id = int(valset_.size());
 
     p = valset_.insert(p, ValueSet::value_type(*i, KeyCount(id, 1))); // id for value
 
@@ -698,7 +698,7 @@ calc()
   for (auto &v : values_) {
     if (! v) continue;
 
-    int i = *v;
+    long i = *v;
 
     svalues_.push_back(i);
   }
@@ -718,7 +718,7 @@ calc()
   int i = 0;
 
   for (auto v : svalues_) {
-    if (statData_.isOutlier(v))
+    if (statData_.isOutlier(double(v)))
       outliers_.push_back(i);
 
     ++i;
@@ -727,11 +727,11 @@ calc()
 
 bool
 CQIValues::
-isOutlier(int v) const
+isOutlier(long v) const
 {
   initCalc();
 
-  return statData_.isOutlier(v);
+  return statData_.isOutlier(double(v));
 }
 
 //------
@@ -790,7 +790,7 @@ addValue(const OptString &s)
   auto p = valset_.find(*s);
 
   if (p == valset_.end()) {
-    int id = valset_.size();
+    int id = int(valset_.size());
 
     p = valset_.insert(p, ValueSet::value_type(*s, KeyCount(id, 1))); // id for value
 

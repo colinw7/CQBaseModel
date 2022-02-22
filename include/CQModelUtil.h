@@ -95,7 +95,7 @@ QVariant boolVariant(bool b);
 QVariant colorVariant(const QColor &c);
 
 // create empty variant
-QVariant nullVariant();
+//QVariant nullVariant();
 
 // create variant for NaN real value
 QVariant nanVariant();

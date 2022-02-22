@@ -264,7 +264,7 @@ columnDuplicates(int column, bool all) const
   std::vector<QVariant> rowValues1, rowValues2;
 
   if (all)
-    rowValues2.resize(numColumns_);
+    rowValues2.resize(size_t(numColumns_));
   else
     rowValues2.resize(1);
 
@@ -281,9 +281,9 @@ columnDuplicates(int column, bool all) const
 
         auto var = CQModelUtil::modelValue(model(), r, c, parent, ok);
 
-        rowValues2[c] = var;
+        rowValues2[size_t(c)] = var;
 
-        if (rowValues1.empty() || var != rowValues1[c])
+        if (rowValues1.empty() || var != rowValues1[size_t(c)])
           match = false;
       }
     }
@@ -598,7 +598,7 @@ uniqueValues() const
     valueSet_->ivals().uniqueValues(values);
 
     for (const auto &v : values)
-      vars.push_back(v);
+      vars.push_back(CQModelUtil::intVariant(v));
   }
   else if (type() == CQBaseModelType::REAL) {
     CQRValues::Values values;
@@ -784,7 +784,7 @@ outlierValues() const
     const auto &outliers = valueSet_->ivals().outliers();
 
     for (auto &o : outliers)
-      vars.push_back(valueSet_->ivals().svalue(o));
+      vars.push_back(CQModelUtil::intVariant(valueSet_->ivals().svalue(o)));
   }
   else if (type() == CQBaseModelType::REAL) {
     const auto &outliers = valueSet_->rvals().outliers();
@@ -1233,7 +1233,7 @@ addValue(const QVariant &value)
   auto p = valueInds_.find(value);
 
   if (p == valueInds_.end()) {
-    int ind = valueInds_.size();
+    int ind = int(valueInds_.size());
 
     (void) valueInds_.insert(p, VariantInds::value_type(value, ind));
   }

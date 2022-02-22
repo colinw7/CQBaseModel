@@ -91,6 +91,12 @@ class CQDataModel : public CQBaseModel {
 
   virtual bool acceptsRow(const Cells &cells) const;
 
+  //---
+
+  int findColumnValue(int column, const QVariant &var) const;
+
+  void getColumnValues(int column, QVariantList &vars) const;
+
  protected slots:
   void resetColumnCache(int column);
 
@@ -99,7 +105,7 @@ class CQDataModel : public CQBaseModel {
 
  protected:
   void init(int numCols=0, int numRows=0);
-  void init1(int numCols, int numRows);
+  void init1(size_t numCols, size_t numRows);
 
   //---
 
@@ -116,6 +122,12 @@ class CQDataModel : public CQBaseModel {
 
   void applyFilterColumns(const QStringList &columns);
 
+  //---
+
+  void clearCachedColumn();
+
+  void updateColumnValues(int column) const;
+
  protected:
   struct FilterData {
     int     column { -1 };
@@ -129,15 +141,18 @@ class CQDataModel : public CQBaseModel {
 
   QString filename_; //!< input filename
 
-  Cells hheader_;  //!< horizontal header values
-  Cells vheader_;  //!< vertical header values
-  Data  data_;     //!< row values
+  Cells hheader_; //!< horizontal header values
+  Cells vheader_; //!< vertical header values
+  Data  data_;    //!< row values
 
   QString     filter_;                 //!< filter text
   bool        filterInited_ { false }; //!< filter initialized
   FilterDatas filterDatas_;            //!< filter datas
 
   CQModelDetails* details_ { nullptr }; //!< model details
+
+  mutable int          cachedColumn_ { -1 };
+  mutable QVariantList cachedColumnVars_;
 };
 
 #endif
