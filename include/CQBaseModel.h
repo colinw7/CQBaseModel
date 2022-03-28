@@ -200,6 +200,10 @@ class CQBaseModel : public QAbstractItemModel {
   //! convert string to integer
   static long toInt(const QString &str, bool &ok);
 
+  void copyHeaderRoles(QAbstractItemModel *toModel) const;
+
+  void copyColumnHeaderRoles(QAbstractItemModel *toModel, int c1, int c2) const;
+
  signals:
   //! signals when data changed
   void columnTypeChanged      (int column);

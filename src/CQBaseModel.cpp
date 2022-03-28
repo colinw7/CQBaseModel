@@ -105,9 +105,9 @@ genColumnTypes()
   resetColumnTypes();
 
   // auto determine type for each column. Do column by column to allow early out
-  int nc = columnCount();
+  auto nc = columnCount();
 
-  for (int column = 0; column < nc; ++column)
+  for (decltype(nc) column = 0; column < nc; ++column)
     genColumnType(column);
 }
 
@@ -141,7 +141,7 @@ void
 CQBaseModel::
 genColumnTypeI(ColumnData &columnData)
 {
-  int maxRows = maxTypeRows();
+  auto maxRows = maxTypeRows();
 
   if (maxRows <= 0)
     maxRows = 1000;
@@ -930,7 +930,9 @@ modelColumnNameToInd(const QAbstractItemModel *model, const QString &name)
 {
   int role = Qt::DisplayRole;
 
-  for (int icolumn = 0; icolumn < model->columnCount(); ++icolumn) {
+  auto nc = model->columnCount();
+
+  for (decltype(nc) icolumn = 0; icolumn < nc; ++icolumn) {
     auto var = model->headerData(icolumn, Qt::Horizontal, role);
 
     if (! var.isValid())
@@ -1102,4 +1104,47 @@ CQBaseModel::
 toInt(const QString &str, bool &ok)
 {
   return str.toInt(&ok);
+}
+
+//---
+
+void
+CQBaseModel::
+copyHeaderRoles(QAbstractItemModel *toModel) const
+{
+  auto nc = columnCount();
+
+  for (decltype(nc) ic = 0; ic < nc; ++ic)
+    copyColumnHeaderRoles(toModel, ic, ic);
+}
+
+void
+CQBaseModel::
+copyColumnHeaderRoles(QAbstractItemModel *toModel, int c1, int c2) const
+{
+  static std::vector<int> hroles = {{
+    Qt::DisplayRole,
+    CQModelUtil::roleCast(CQBaseModelRole::Type),
+    CQModelUtil::roleCast(CQBaseModelRole::BaseType),
+    CQModelUtil::roleCast(CQBaseModelRole::TypeValues),
+    CQModelUtil::roleCast(CQBaseModelRole::Min),
+    CQModelUtil::roleCast(CQBaseModelRole::Max),
+    CQModelUtil::roleCast(CQBaseModelRole::Key),
+    CQModelUtil::roleCast(CQBaseModelRole::Sorted),
+    CQModelUtil::roleCast(CQBaseModelRole::SortOrder),
+    CQModelUtil::roleCast(CQBaseModelRole::Title),
+    CQModelUtil::roleCast(CQBaseModelRole::Tip),
+    CQModelUtil::roleCast(CQBaseModelRole::DataMin),
+    CQModelUtil::roleCast(CQBaseModelRole::DataMax),
+    CQModelUtil::roleCast(CQBaseModelRole::HeaderType),
+    CQModelUtil::roleCast(CQBaseModelRole::HeaderTypeValues)
+  }};
+
+  // copy horizontal header data
+  for (const auto &role : hroles) {
+    auto var = headerData(c1, Qt::Horizontal, role);
+
+    if (var.isValid())
+      toModel->setHeaderData(c2, Qt::Horizontal, var, role);
+  }
 }
