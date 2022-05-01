@@ -207,6 +207,10 @@ calcColumnType(const QAbstractItemModel *model, int icolumn, int maxRows)
      column_(column) {
     }
 
+    void initVisit() override {
+      nr_ = model_->rowCount(QModelIndex());
+    }
+
     State visit(const QAbstractItemModel *model, const VisitData &data) override {
       auto ind = model->index(data.row, column_, data.parent);
 
@@ -221,10 +225,12 @@ calcColumnType(const QAbstractItemModel *model, int icolumn, int maxRows)
 
         auto str = modelString(model, ind, ok);
 
-        if (! str.length())
+        if (! str.length()) { // empty
+          ++numEmpty_;
           return State::SKIP;
+        }
 
-        isInt_ = false;
+        isInt_ = false; // non-integral string so can't be intergal
       }
 
       // if column can be real, check if value is valid real
@@ -238,26 +244,33 @@ calcColumnType(const QAbstractItemModel *model, int icolumn, int maxRows)
 
         auto str = modelString(model, ind, ok);
 
-        if (! str.length())
+        if (! str.length()) { // empty
+          ++numEmpty_;
           return State::SKIP;
+        }
 
-        isReal_ = false;
+        isReal_ = false; // non-real string so can't be real
       }
 
-      // not value real or integer so assume string and we are done
+      // not real or integer so assume string and we are done
       return State::TERMINATE;
     }
 
     CQBaseModelType columnType() {
+      if (numEmpty_ == nr_ || (nr_ > maxRows_ && numEmpty_ == maxRows_))
+        return CQBaseModelType::STRING;
+
       if      (isInt_ ) return CQBaseModelType::INTEGER;
       else if (isReal_) return CQBaseModelType::REAL;
       else              return CQBaseModelType::STRING;
     }
 
    private:
-    int  column_ { -1 };   // column to check
-    bool isInt_  { true }; // could be integeral
-    bool isReal_ { true }; // could be real
+    int  column_   { -1 };   //!< column to check
+    bool isInt_    { true }; //!< could be integeral
+    bool isReal_   { true }; //!< could be real
+    int  nr_       { 0 };    //!< number of rows
+    int  numEmpty_ { 0 };    //!< number of empty values
   };
 
   // determine column value type by looking at model values
