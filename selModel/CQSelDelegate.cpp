@@ -15,7 +15,14 @@ paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &
 
     auto checkState = (checked ? Qt::Checked : Qt::Unchecked);
 
-    QItemDelegate::drawCheck(painter, option, option.rect, checkState);
+    int w = option.rect.width();
+    int h = option.rect.height();
+
+    int s = std::min(w, h);
+
+    QRect rect1(option.rect.center() - QPoint(s/2, s/2), QSize(s, s));
+
+    QItemDelegate::drawCheck(painter, option, rect1, checkState);
   }
   else
     QItemDelegate::paint(painter, option, index);

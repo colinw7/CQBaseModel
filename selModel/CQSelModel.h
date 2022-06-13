@@ -2,6 +2,7 @@
 #define CQSelModel_H
 
 #include <QAbstractItemModel>
+#include <QIcon>
 
 class CQSelView;
 
@@ -80,6 +81,9 @@ class CQSelModel : public QAbstractItemModel {
   CQSelView*          view_        { nullptr };
   QAbstractItemModel* sourceModel_ { nullptr };
   Selected            selected_;
+  QIcon               checkedIcon_;
+  QIcon               uncheckedIcon_;
+  QIcon               partCheckedIcon_;
 };
 
 #endif

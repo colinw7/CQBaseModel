@@ -1,9 +1,14 @@
 #include <CQSelModel.h>
 #include <CQSelView.h>
+#include <CQPixmapCache.h>
 
 #include <QFontMetrics>
 
 #include <cassert>
+
+#include <svg/checked_svg.h>
+#include <svg/unchecked_svg.h>
+#include <svg/part_checked_svg.h>
 
 //------
 
@@ -12,6 +17,10 @@ CQSelModel(CQSelView *view) :
  QAbstractItemModel(), view_(view)
 {
   setObjectName("subsetModel");
+
+  checkedIcon_     = CQPixmapCacheInst->getIcon("CHECKED");
+  uncheckedIcon_   = CQPixmapCacheInst->getIcon("UNCHECKED");
+  partCheckedIcon_ = CQPixmapCacheInst->getIcon("PART_CHECKED");
 }
 
 CQSelModel::
@@ -158,6 +167,20 @@ headerData(int section, Qt::Orientation orientation, int role) const
   if (section == 0) {
     if      (role == Qt::DisplayRole) {
       return "";
+    }
+    else if (role == Qt::DecorationRole) {
+      int numSelected { 0 };
+
+      for (const auto &ps : selected_)
+        if (ps.second)
+          ++numSelected;
+
+      if      (numSelected == 0)
+        return uncheckedIcon_;
+      else if (numSelected == rowCount())
+        return checkedIcon_;
+      else
+        return partCheckedIcon_;
     }
     else if (role == Qt::SizeHintRole) {
       QFontMetrics fm(view_->font());

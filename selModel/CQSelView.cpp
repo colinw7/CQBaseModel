@@ -34,26 +34,33 @@ CQSelView::
 setModel(QAbstractItemModel *model)
 {
   delete selModel_;
+  delete sortModel_;
 
-  selModel_ = new CQSelModel(this);
-  selModel_->setSourceModel(model);
+  if (model) {
+    selModel_ = new CQSelModel(this);
+    selModel_->setSourceModel(model);
 
-  sortModel_ = new QSortFilterProxyModel;
-  sortModel_->setSourceModel(selModel_);
+    sortModel_ = new QSortFilterProxyModel;
+    sortModel_->setSourceModel(selModel_);
 
-  QTableView::setModel(sortModel_);
+    QTableView::setModel(sortModel_);
 
-  auto *sm = selectionModel();
-  if (! sm) return;
+    auto *sm = selectionModel();
+    if (! sm) return;
 
-  auto *hheader = this->horizontalHeader();
+    auto *hheader = this->horizontalHeader();
 
-  QFontMetrics fm(font());
-  hheader->resizeSection(0, fm.height() + 4);
-  hheader->setSectionResizeMode(0, QHeaderView::Fixed);
+    QFontMetrics fm(font());
+    hheader->resizeSection(0, fm.height() + 16);
+    hheader->setSectionResizeMode(0, QHeaderView::Fixed);
 
-  connect(sm, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-          this, SLOT(updateModelFromSelection()));
+    connect(sm, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+            this, SLOT(updateModelFromSelection()));
+  }
+  else {
+    selModel_  = nullptr;
+    sortModel_ = nullptr;
+  }
 }
 
 void
