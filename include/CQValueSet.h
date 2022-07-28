@@ -10,7 +10,7 @@
 #include <set>
 #include <map>
 #include <future>
-#include <boost/optional.hpp>
+#include <optional>
 
 class CQTrie;
 class CQTriePatterns;
@@ -22,7 +22,7 @@ class CQTriePatterns;
  */
 class CQRValues {
  public:
-  using OptReal = boost::optional<double>;
+  using OptReal = std::optional<double>;
   using Values  = std::vector<double>;
   using Counts  = std::vector<int>;
   using Indices = std::vector<int>;
@@ -180,7 +180,7 @@ class CQRValues {
  */
 class CQIValues {
  public:
-  using OptInt  = boost::optional<long>;
+  using OptInt  = std::optional<long>;
   using Values  = std::vector<long>;
   using Counts  = std::vector<int>;
   using Indices = std::vector<int>;
@@ -325,7 +325,7 @@ class CQIValues {
  */
 class CQSValues {
  public:
-  using OptString = boost::optional<QString>;
+  using OptString = std::optional<QString>;
   using Values    = std::vector<QString>;
   using Counts    = std::vector<int>;
 
@@ -453,9 +453,9 @@ class CQValueSet : public QObject {
 
  public:
   using Type      = CQBaseModelType;
-  using OptInt    = boost::optional<long>;
-  using OptReal   = boost::optional<double>;
-  using OptString = boost::optional<QString>;
+  using OptInt    = std::optional<long>;
+  using OptReal   = std::optional<double>;
+  using OptString = std::optional<QString>;
 
  public:
   CQValueSet();

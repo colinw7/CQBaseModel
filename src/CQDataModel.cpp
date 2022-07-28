@@ -396,7 +396,7 @@ data(const QModelIndex &index, int role) const
   if (r < 0 || size_t(r) >= nr)
     return QVariant();
 
-  const Cells &cells = data_[size_t(r)];
+  const auto &cells = data_[size_t(r)];
 
   auto nc = cells.size();
 
@@ -516,7 +516,7 @@ setData(const QModelIndex &index, const QVariant &value, int role)
   if (r < 0 || size_t(r) >= nr)
     return false;
 
-  Cells &cells = data_[size_t(r)];
+  auto &cells = data_[size_t(r)];
 
 //auto nc = cells.size();
   auto nc = columnCount();
@@ -664,8 +664,8 @@ applyFilterColumns(const QStringList &columns)
   if (! columns.length())
     return;
 
-  Data  data    = data_;
-  Cells hheader = hheader_;
+  auto data    = data_;
+  auto hheader = hheader_;
 
   std::map<int, int> columnMap;
 
@@ -722,8 +722,8 @@ applyFilterColumns(const QStringList &columns)
   auto nr = data.size();
 
   for (size_t r = 0; r < nr; ++r) {
-    Cells &cells1 = data [r]; // old data
-    Cells &cells2 = data_[r]; // new data
+    auto &cells1 = data [r]; // old data
+    auto &cells2 = data_[r]; // new data
 
     cells2.clear(); cells2.resize(size_t(nc2));
 

@@ -115,7 +115,7 @@ void
 CQBaseModel::
 genColumnType(int column)
 {
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   genColumnType(columnData);
 
@@ -183,7 +183,7 @@ columnType(int column) const
   if (column < 0 || column >= columnCount())
     return CQBaseModelType::NONE;
 
-  const ColumnData &columnData = getColumnData(column);
+  const auto &columnData = getColumnData(column);
 
   if (columnData.type == CQBaseModelType::NONE)
     genColumnType(columnData);
@@ -198,7 +198,7 @@ setColumnType(int column, CQBaseModelType type)
   if (column < 0 || column >= columnCount())
     return false;
 
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   if (columnData.baseType == CQBaseModelType::NONE)
     genColumnType(columnData);
@@ -219,7 +219,7 @@ columnBaseType(int column) const
   if (column < 0 || column >= columnCount())
     return CQBaseModelType::NONE;
 
-  const ColumnData &columnData = getColumnData(column);
+  const auto &columnData = getColumnData(column);
 
   if (columnData.type == CQBaseModelType::NONE)
     genColumnType(columnData);
@@ -234,7 +234,7 @@ setColumnBaseType(int column, CQBaseModelType type)
   if (column < 0 || column >= columnCount())
     return false;
 
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   if (type != columnData.baseType) {
     columnData.baseType = type;
@@ -252,7 +252,7 @@ columnTypeValues(int column) const
   if (column < 0 || column >= columnCount())
     return QString();
 
-  const ColumnData &columnData = getColumnData(column);
+  const auto &columnData = getColumnData(column);
 
   return columnData.typeValues;
 }
@@ -264,7 +264,7 @@ setColumnTypeValues(int column, const QString &str)
   if (column < 0 || column >= columnCount())
     return false;
 
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   columnData.typeValues = str;
 
@@ -280,7 +280,7 @@ columnMin(int column) const
   if (column < 0 || column >= columnCount())
     return QVariant();
 
-  const ColumnData &columnData = getColumnData(column);
+  const auto &columnData = getColumnData(column);
 
   return columnData.min;
 }
@@ -292,7 +292,7 @@ setColumnMin(int column, const QVariant &v)
   if (column < 0 || column >= columnCount())
     return false;
 
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   columnData.min = v;
 
@@ -308,7 +308,7 @@ columnMax(int column) const
   if (column < 0 || column >= columnCount())
     return QVariant();
 
-  const ColumnData &columnData = getColumnData(column);
+  const auto &columnData = getColumnData(column);
 
   return columnData.max;
 }
@@ -320,7 +320,7 @@ setColumnMax(int column, const QVariant &v)
   if (column < 0 || column >= columnCount())
     return false;
 
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   columnData.max = v;
 
@@ -336,7 +336,7 @@ isColumnKey(int column) const
   if (column < 0 || column >= columnCount())
     return false;
 
-  const ColumnData &columnData = getColumnData(column);
+  const auto &columnData = getColumnData(column);
 
   return columnData.key;
 }
@@ -348,7 +348,7 @@ setColumnKey(int column, bool b)
   if (column < 0 || column >= columnCount())
     return false;
 
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   columnData.key = b;
 
@@ -364,7 +364,7 @@ isColumnSorted(int column) const
   if (column < 0 || column >= columnCount())
     return false;
 
-  const ColumnData &columnData = getColumnData(column);
+  const auto &columnData = getColumnData(column);
 
   return columnData.sorted;
 }
@@ -376,7 +376,7 @@ setColumnSorted(int column, bool b)
   if (column < 0 || column >= columnCount())
     return false;
 
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   columnData.sorted = b;
 
@@ -392,7 +392,7 @@ columnSortOrder(int column) const
   if (column < 0 || column >= columnCount())
     return Qt::AscendingOrder;
 
-  const ColumnData &columnData = getColumnData(column);
+  const auto &columnData = getColumnData(column);
 
   return columnData.sortOrder;
 }
@@ -404,7 +404,7 @@ setColumnSortOrder(int column, Qt::SortOrder order)
   if (column < 0 || column >= columnCount())
     return false;
 
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   columnData.sortOrder = order;
 
@@ -420,7 +420,7 @@ columnTitle(int column) const
   if (column < 0 || column >= columnCount())
     return "";
 
-  const ColumnData &columnData = getColumnData(column);
+  const auto &columnData = getColumnData(column);
 
   return columnData.title;
 }
@@ -432,7 +432,7 @@ setColumnTitle(int column, const QString &s)
   if (column < 0 || column >= columnCount())
     return false;
 
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   columnData.title = s;
 
@@ -448,7 +448,7 @@ columnTip(int column) const
   if (column < 0 || column >= columnCount())
     return "";
 
-  const ColumnData &columnData = getColumnData(column);
+  const auto &columnData = getColumnData(column);
 
   return columnData.tip;
 }
@@ -460,7 +460,7 @@ setColumnTip(int column, const QString &s)
   if (column < 0 || column >= columnCount())
     return false;
 
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   columnData.tip = s;
 
@@ -476,7 +476,7 @@ columnHeaderType(int column) const
   if (column < 0 || column >= columnCount())
     return CQBaseModelType::NONE;
 
-  const ColumnData &columnData = getColumnData(column);
+  const auto &columnData = getColumnData(column);
 
   return columnData.headerType;
 }
@@ -488,7 +488,7 @@ setColumnHeaderType(int column, CQBaseModelType type)
   if (column < 0 || column >= columnCount())
     return false;
 
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   if (columnData.headerType != type) {
     columnData.headerType = type;
@@ -506,7 +506,7 @@ headerTypeValues(int column) const
   if (column < 0 || column >= columnCount())
     return QString();
 
-  const ColumnData &columnData = getColumnData(column);
+  const auto &columnData = getColumnData(column);
 
   return columnData.headerTypeValues;
 }
@@ -518,7 +518,7 @@ setHeaderTypeValues(int column, const QString &str)
   if (column < 0 || column >= columnCount())
     return false;
 
-  ColumnData &columnData = getColumnData(column);
+  auto &columnData = getColumnData(column);
 
   columnData.headerTypeValues = str;
 
@@ -580,7 +580,7 @@ getColumnData(int column)
   auto p = columnDatas_.find(column);
 
   if (p != columnDatas_.end()) {
-    ColumnData &columnData = (*p).second;
+    auto &columnData = (*p).second;
 
     assert(columnData.column == column);
 
@@ -616,7 +616,7 @@ CQBaseModel::
 resetColumnTypes()
 {
   for (auto &p : columnDatas_) {
-    ColumnData &columnData = p.second;
+    auto &columnData = p.second;
 
     columnData.type = CQBaseModelType::NONE;
   }
