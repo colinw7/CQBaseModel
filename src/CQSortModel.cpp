@@ -17,7 +17,7 @@ setFilter(const QString &filter)
 
   auto *model = sourceModel();
 
-  auto strs = filter.split(':', QString::KeepEmptyParts);
+  auto strs = filter.split(':', Qt::KeepEmptyParts);
 
   if (strs.size() == 2) {
     auto name   = strs[0];

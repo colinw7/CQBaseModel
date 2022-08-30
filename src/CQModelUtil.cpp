@@ -340,7 +340,7 @@ nameToRole(const QString &name)
   else if (name == "background"    ) return Qt::BackgroundRole;
   else if (name == "foreground"    ) return Qt::ForegroundRole;
   else if (name == "text_alignment") return Qt::TextAlignmentRole;
-  else if (name == "text_color"    ) return Qt::TextColorRole;
+  else if (name == "text_color"    ) return Qt::ForegroundRole;
   else if (name == "decoration"    ) return Qt::DecorationRole;
 
   // custom
