@@ -76,6 +76,14 @@ fromString(const QString &str, NameValues &nameValues)
 
 bool
 CQModelNameValues::
+hasNameValue(const QString &name) const
+{
+  auto p = nameValues_.find(name);
+  return (p != nameValues_.end());
+}
+
+bool
+CQModelNameValues::
 nameValue(const QString &name, QVariant &value) const
 {
   auto p = nameValues_.find(name);

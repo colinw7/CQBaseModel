@@ -351,7 +351,7 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
       hheader_[section1] = value;
 
-      emit headerDataChanged(orientation, section, section);
+      Q_EMIT headerDataChanged(orientation, section, section);
 
       return true;
     }
@@ -371,7 +371,7 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
     if (role == Qt::DisplayRole) {
       vheader_[section1] = value;
 
-      emit headerDataChanged(orientation, section, section);
+      Q_EMIT headerDataChanged(orientation, section, section);
 
       return true;
     }
@@ -563,7 +563,7 @@ setData(const QModelIndex &index, const QVariant &value, int role)
 
     cells[size_t(c)] = value;
 
-    emit dataChanged(index, index, QVector<int>(1, role));
+    Q_EMIT dataChanged(index, index, QVector<int>(1, role));
   }
   else if (role == Qt::EditRole) {
     //auto type = columnType(c);
@@ -578,7 +578,7 @@ setData(const QModelIndex &index, const QVariant &value, int role)
     clearRowRoleValue(r, CQModelUtil::roleCast(CQBaseModelRole::CachedValue));
     clearRowRoleValue(r, CQModelUtil::roleCast(CQBaseModelRole::OutputValue));
 
-    emit dataChanged(index, index, QVector<int>(1, role));
+    Q_EMIT dataChanged(index, index, QVector<int>(1, role));
   }
   else if (role == CQModelUtil::roleCast(CQBaseModelRole::RawValue) ||
            role == CQModelUtil::roleCast(CQBaseModelRole::IntermediateValue) ||
@@ -589,7 +589,7 @@ setData(const QModelIndex &index, const QVariant &value, int role)
   else {
     setRowRoleValue(r, role, value);
 
-    emit dataChanged(index, index, QVector<int>(1, role));
+    Q_EMIT dataChanged(index, index, QVector<int>(1, role));
   }
 
   return true;

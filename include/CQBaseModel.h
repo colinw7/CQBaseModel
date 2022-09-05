@@ -99,6 +99,10 @@ class CQBaseModel : public QAbstractItemModel {
   QVariant columnMax(int column) const;
   bool setColumnMax(int column, const QVariant &v);
 
+  //! get/set column custom value sum
+  QVariant columnSum(int column) const;
+  bool setColumnSum(int column, const QVariant &v);
+
   //! get/set column is key (unique values)
   bool isColumnKey(int column) const;
   bool setColumnKey(int column, bool b);
@@ -236,6 +240,7 @@ class CQBaseModel : public QAbstractItemModel {
     QString       typeValues;                             //!< type values
     QVariant      min;                                    //!< custom min value
     QVariant      max;                                    //!< custom max value
+    QVariant      sum;                                    //!< custom value sum
     bool          key             { false };              //!< is key
     bool          sorted          { false };              //!< is sorted
     Qt::SortOrder sortOrder       { Qt::AscendingOrder }; //!< sort ortder

@@ -349,6 +349,7 @@ nameToRole(const QString &name)
   else if (name == "type_values"       ) return roleCast(CQBaseModelRole::TypeValues);
   else if (name == "min"               ) return roleCast(CQBaseModelRole::Min);
   else if (name == "max"               ) return roleCast(CQBaseModelRole::Max);
+  else if (name == "sum"               ) return roleCast(CQBaseModelRole::Sum);
   else if (name == "sorted"            ) return roleCast(CQBaseModelRole::Sorted);
   else if (name == "sort_order"        ) return roleCast(CQBaseModelRole::SortOrder);
   else if (name == "title"             ) return roleCast(CQBaseModelRole::Title);

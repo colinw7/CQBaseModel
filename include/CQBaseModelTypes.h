@@ -43,7 +43,9 @@ enum class CQBaseModelRole {
   SymbolSize        = Type + 24,        //!< cell symbol size
   FontSize          = Type + 25,        //!< cell font size
   Style             = Type + 26,        //!< cell style
-  Export            = Type + 27         //!< export role
+  Export            = Type + 27,        //!< export role
+  Sum               = Type + 28,        //!< column user value sum
+  BadValue          = Type + 29         //!< column user bad value
 };
 
 //! model value types supported by CQBaseModel

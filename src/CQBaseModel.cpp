@@ -2,6 +2,10 @@
 #include <CQModelUtil.h>
 #include <CQModelNameValues.h>
 #include <CMathUtil.h>
+
+#include <QApplication>
+#include <QThread>
+
 #include <cmath>
 #include <cassert>
 
@@ -119,7 +123,7 @@ genColumnType(int column)
 
   genColumnType(columnData);
 
-  emit columnTypeChanged(columnData.column);
+  Q_EMIT columnTypeChanged(columnData.column);
 }
 
 void
@@ -206,7 +210,7 @@ setColumnType(int column, CQBaseModelType type)
   if (type != columnData.type) {
     columnData.type = type;
 
-    emit columnTypeChanged(column);
+    Q_EMIT columnTypeChanged(column);
   }
 
   return true;
@@ -239,7 +243,7 @@ setColumnBaseType(int column, CQBaseModelType type)
   if (type != columnData.baseType) {
     columnData.baseType = type;
 
-    emit columnBaseTypeChanged(column);
+    Q_EMIT columnBaseTypeChanged(column);
   }
 
   return true;
@@ -268,7 +272,7 @@ setColumnTypeValues(int column, const QString &str)
 
   columnData.typeValues = str;
 
-  emit columnTypeChanged(column);
+  Q_EMIT columnTypeChanged(column);
 
   return true;
 }
@@ -296,7 +300,7 @@ setColumnMin(int column, const QVariant &v)
 
   columnData.min = v;
 
-  emit columnRangeChanged(column);
+  Q_EMIT columnRangeChanged(column);
 
   return true;
 }
@@ -324,7 +328,35 @@ setColumnMax(int column, const QVariant &v)
 
   columnData.max = v;
 
-  emit columnRangeChanged(column);
+  Q_EMIT columnRangeChanged(column);
+
+  return true;
+}
+
+QVariant
+CQBaseModel::
+columnSum(int column) const
+{
+  if (column < 0 || column >= columnCount())
+    return QVariant();
+
+  const auto &columnData = getColumnData(column);
+
+  return columnData.sum;
+}
+
+bool
+CQBaseModel::
+setColumnSum(int column, const QVariant &v)
+{
+  if (column < 0 || column >= columnCount())
+    return false;
+
+  auto &columnData = getColumnData(column);
+
+  columnData.sum = v;
+
+  Q_EMIT columnRangeChanged(column);
 
   return true;
 }
@@ -352,7 +384,7 @@ setColumnKey(int column, bool b)
 
   columnData.key = b;
 
-  emit columnKeyChanged(column);
+  Q_EMIT columnKeyChanged(column);
 
   return true;
 }
@@ -380,7 +412,7 @@ setColumnSorted(int column, bool b)
 
   columnData.sorted = b;
 
-  emit columnSortedChanged(column);
+  Q_EMIT columnSortedChanged(column);
 
   return true;
 }
@@ -408,7 +440,7 @@ setColumnSortOrder(int column, Qt::SortOrder order)
 
   columnData.sortOrder = order;
 
-  emit columnSortOrderChanged(column);
+  Q_EMIT columnSortOrderChanged(column);
 
   return true;
 }
@@ -436,7 +468,7 @@ setColumnTitle(int column, const QString &s)
 
   columnData.title = s;
 
-  emit columnTitleChanged(column);
+  Q_EMIT columnTitleChanged(column);
 
   return true;
 }
@@ -464,7 +496,7 @@ setColumnTip(int column, const QString &s)
 
   columnData.tip = s;
 
-  emit columnTipChanged(column);
+  Q_EMIT columnTipChanged(column);
 
   return true;
 }
@@ -493,7 +525,7 @@ setColumnHeaderType(int column, CQBaseModelType type)
   if (columnData.headerType != type) {
     columnData.headerType = type;
 
-    emit columnHeaderTypeChanged(column);
+    Q_EMIT columnHeaderTypeChanged(column);
   }
 
   return true;
@@ -522,7 +554,7 @@ setHeaderTypeValues(int column, const QString &str)
 
   columnData.headerTypeValues = str;
 
-  emit columnTypeChanged(column);
+  Q_EMIT columnTypeChanged(column);
 
   return true;
 }
@@ -743,6 +775,9 @@ headerData(int section, Qt::Orientation orientation, int role) const
     else if (role == static_cast<int>(CQBaseModelRole::Max)) {
       return columnMax(section);
     }
+    else if (role == static_cast<int>(CQBaseModelRole::Sum)) {
+      return columnSum(section);
+    }
     else if (role == static_cast<int>(CQBaseModelRole::Key)) {
       return isColumnKey(section);
     }
@@ -797,6 +832,8 @@ CQBaseModel::
 setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
 {
   // generic column data
+  bool rc = false;
+
   if      (orientation == Qt::Horizontal) {
     if      (role == static_cast<int>(CQBaseModelRole::Type)) {
       bool ok { false };
@@ -804,7 +841,7 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
       auto type = variantToType(value, &ok);
       if (! ok) return false;
 
-      return setColumnType(section, type);
+      rc = setColumnType(section, type);
     }
     else if (role == static_cast<int>(CQBaseModelRole::BaseType)) {
       bool ok { false };
@@ -812,33 +849,36 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
       auto type = variantToType(value, &ok);
       if (! ok) return false;
 
-      return setColumnBaseType(section, type);
+      rc = setColumnBaseType(section, type);
     }
     else if (role == static_cast<int>(CQBaseModelRole::TypeValues)) {
       auto str = value.toString();
 
-      return setColumnTypeValues(section, str);
+      rc = setColumnTypeValues(section, str);
     }
     else if (role == static_cast<int>(CQBaseModelRole::Min)) {
-      return setColumnMin(section, value);
+      rc = setColumnMin(section, value);
     }
     else if (role == static_cast<int>(CQBaseModelRole::Max)) {
-      return setColumnMax(section, value);
+      rc = setColumnMax(section, value);
+    }
+    else if (role == static_cast<int>(CQBaseModelRole::Sum)) {
+      rc = setColumnSum(section, value);
     }
     else if (role == static_cast<int>(CQBaseModelRole::Key)) {
-      return setColumnKey(section, value.toBool());
+      rc = setColumnKey(section, value.toBool());
     }
     else if (role == static_cast<int>(CQBaseModelRole::Sorted)) {
-      return setColumnSorted(section, value.toBool());
+      rc = setColumnSorted(section, value.toBool());
     }
     else if (role == static_cast<int>(CQBaseModelRole::SortOrder)) {
-      return setColumnSortOrder(section, static_cast<Qt::SortOrder>(value.toInt()));
+      rc = setColumnSortOrder(section, static_cast<Qt::SortOrder>(value.toInt()));
     }
     else if (role == static_cast<int>(CQBaseModelRole::Title)) {
-      return setColumnTitle(section, value.toString());
+      rc = setColumnTitle(section, value.toString());
     }
     else if (role == static_cast<int>(CQBaseModelRole::Tip)) {
-      return setColumnTip(section, value.toString());
+      rc = setColumnTip(section, value.toString());
     }
     else if (role == static_cast<int>(CQBaseModelRole::DataMin)) {
       assert(false);
@@ -857,7 +897,7 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
     else if (role == static_cast<int>(CQBaseModelRole::HeaderTypeValues)) {
       auto str = value.toString();
 
-      return setHeaderTypeValues(section, str);
+      rc = setHeaderTypeValues(section, str);
     }
     else {
       return QAbstractItemModel::setHeaderData(section, orientation, role);
@@ -866,7 +906,7 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
   // generic row data
   else if (orientation == Qt::Vertical) {
     if (role == static_cast<int>(CQBaseModelRole::Group)) {
-      return setRowGroup(section, value);
+      rc = setRowGroup(section, value);
     }
     else {
       return QAbstractItemModel::setHeaderData(section, orientation, role);
@@ -876,7 +916,15 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
     assert(false);
   }
 
-  return false;
+  if (rc) {
+    auto *t1 = this->thread();
+    auto *t2 = QThread::currentThread();
+
+    if (t1 == t2)
+      Q_EMIT headerDataChanged(orientation, section, section);
+  }
+
+  return rc;
 }
 
 QVariant
@@ -1129,6 +1177,7 @@ copyColumnHeaderRoles(QAbstractItemModel *toModel, int c1, int c2) const
     CQModelUtil::roleCast(CQBaseModelRole::TypeValues),
     CQModelUtil::roleCast(CQBaseModelRole::Min),
     CQModelUtil::roleCast(CQBaseModelRole::Max),
+    CQModelUtil::roleCast(CQBaseModelRole::Sum),
     CQModelUtil::roleCast(CQBaseModelRole::Key),
     CQModelUtil::roleCast(CQBaseModelRole::Sorted),
     CQModelUtil::roleCast(CQBaseModelRole::SortOrder),

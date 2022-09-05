@@ -31,6 +31,8 @@ class CQModelNameValues {
 
   static bool fromString(const QString &str, NameValues &nameValues);
 
+  bool hasNameValue(const QString &name) const;
+
   bool nameValue(const QString &name, QVariant &value) const;
   void setNameValue(const QString &name, const QVariant &value);
 

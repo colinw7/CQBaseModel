@@ -147,7 +147,7 @@ reset()
   resetValues();
   }
 
-  emit detailsReset();
+  Q_EMIT detailsReset();
 }
 
 void
