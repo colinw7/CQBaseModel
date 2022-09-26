@@ -21,6 +21,7 @@ CQModelUtil.cpp \
 CQModelVisitor.cpp \
 CQSortModel.cpp \
 CQValueSet.cpp \
+CQAlignVariant.cpp \
 
 HEADERS += \
 ../include/CQBaseModel.h \
@@ -33,6 +34,7 @@ HEADERS += \
 ../include/CQSortModel.h \
 ../include/CQStatData.h \
 ../include/CQValueSet.h \
+../include/CQAlignVariant.h \
 
 OBJECTS_DIR = ../obj
 

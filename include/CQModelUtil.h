@@ -66,18 +66,53 @@ QAbstractItemModel *getBaseModel(QAbstractItemModel *model);
 
 //---
 
-//! get support base mode role names
-const QStringList &roleNames();
+//! get supported model role names
+const QStringList &roleNames(QAbstractItemModel *model);
 
-//! name to base mode role
-int nameToRole(const QString &name);
+//! name to base model role
+int nameToRole(QAbstractItemModel *model, const QString &name);
+
+//! name to base model role
+QString roleToName(QAbstractItemModel *model, int role);
+
+//! name is standard role
+bool nameIsStandard(QAbstractItemModel *model, const QString &name);
+
+//! name is writable role
+bool nameIsWritable(QAbstractItemModel *model, const QString &name);
+
+//! name type
+QVariant::Type nameType(QAbstractItemModel *model, const QString &name);
+
+//---
+
+//! get supported header model role names
+const QStringList &headerRoleNames(QAbstractItemModel *model, Qt::Orientation orient);
+
+//! header name to base model role
+int headerNameToRole(QAbstractItemModel *model, Qt::Orientation orient, const QString &name);
+
+//! header name to base model role
+QString headerRoleToName(QAbstractItemModel *model, Qt::Orientation orient, int role);
+
+//! header name type
+QVariant::Type headerNameType(QAbstractItemModel *model, Qt::Orientation orient,
+                              const QString &name);
+
+//! header name is writable role
+bool headerNameIsWritable(QAbstractItemModel *model, Qt::Orientation orient,
+                          const QString &name);
+
+//---
 
 //! string to model index
 bool stringToRowCol(const QString &name, int &row, int &col);
 
 //---
 
+//! cast model role to int
 int roleCast(const CQBaseModelRole &role);
+//! cast model type to int
 int typeCast(const CQBaseModelType &type);
 
 //---

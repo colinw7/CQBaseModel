@@ -1,5 +1,7 @@
 #include <CQModelUtil.h>
 #include <CQModelVisitor.h>
+#include <CQBaseModel.h>
+#include <CQAlignVariant.h>
 
 #include <CMathUtil.h>
 
@@ -304,85 +306,315 @@ getBaseModel(QAbstractItemModel *model)
 
 //------
 
-const QStringList &
-roleNames()
+using RoleData        = CQBaseModel::RoleData;
+using RoleDatas       = std::vector<RoleData>;
+using NameRoleMap     = std::map<QString, int>;
+using RoleNameMap     = std::map<int, QString>;
+using NameStandardMap = std::map<QString, bool>;
+using NameWritableMap = std::map<QString, bool>;
+using NameTypeMap     = std::map<QString, QVariant::Type>;
+
+static RoleDatas       s_roleNames;
+static RoleNameMap     s_roleNameMap;
+static NameRoleMap     s_nameRoleMap;
+static NameStandardMap s_nameStandardMap;
+static NameWritableMap s_nameWritableMap;
+static NameTypeMap     s_nameTypeMap;
+
+static std::map<Qt::Orientation, RoleDatas>       s_headerRoleDatas;
+static std::map<Qt::Orientation, RoleNameMap>     s_headerRoleNameMap;
+static std::map<Qt::Orientation, NameRoleMap>     s_headerNameRoleMap;
+static std::map<Qt::Orientation, NameTypeMap>     s_headerNameTypeMap;
+static std::map<Qt::Orientation, NameWritableMap> s_headerNameWritableMap;
+
+bool
+initRoles(const QAbstractItemModel *model)
 {
-  static QStringList names;
+  static QAbstractItemModel *s_model;
 
-  if (names.empty()) {
-    // standard
-    names << "display" << "edit" << "user" << "font" << "size_hint" <<
-             "tool_tip" << "background" << "foreground" << "text_alignment" <<
-             "text_color" << "decoration";
+  if (s_model != model)
+    s_roleNames.clear();
 
-    // custom
-    names << "type" << "base_type" << "type_values" << "min" << "max" << "sorted" <<
-             "sort_order" << "title" << "tip" << "key" << "raw_value" << "intermediate_value" <<
-             "cached_value" << "output_value" << "group" << "format" << "iformat" << "oformat" <<
-             "data_min" << "data_max" << "header_type" << "header_type_values" <<
-             "fill_color" << "symbol_type" << "symbol_size" << "font_size" << "style" <<
-             "export";
+  if (! s_roleNames.empty())
+    return false;
+
+  //---
+
+  s_model = const_cast<QAbstractItemModel *>(model);
+
+  s_nameRoleMap    .clear();
+  s_nameStandardMap.clear();
+  s_nameTypeMap    .clear();
+
+  using Standard = CQBaseModel::Standard;
+
+  auto addRole = [&](const RoleData &data, bool alias=false) {
+    if (! alias) {
+      s_roleNames.push_back(data);
+
+      s_roleNameMap[data.role] = data.name;
+    }
+
+    s_nameRoleMap    [data.name] = data.role;
+    s_nameStandardMap[data.name] = data.standard;
+    s_nameWritableMap[data.name] = data.writable;
+    s_nameTypeMap    [data.name] = data.type;
+  };
+
+  auto addStandardRole = [&](const QString &name, int role,
+                             const QVariant::Type &type=QVariant::Invalid, bool alias=false) {
+    addRole(RoleData(name, role, type, Standard(true)), alias);
+  };
+
+  //---
+
+  auto alignMeta = static_cast<QVariant::Type>(CQAlignVariant::getMetaType());
+
+  // standard
+  addStandardRole("display"       , Qt::DisplayRole      , QVariant::Invalid); // QVariant
+  addStandardRole("edit"          , Qt::EditRole         , QVariant::Invalid);
+  addStandardRole("user"          , Qt::UserRole         , QVariant::Invalid);
+  addStandardRole("font"          , Qt::FontRole         , QVariant::Font); // QFont
+  addStandardRole("size_hint"     , Qt::SizeHintRole     , QVariant::Invalid);
+  addStandardRole("tool_tip"      , Qt::ToolTipRole      , QVariant::String);
+  addStandardRole("background"    , Qt::BackgroundRole   , QVariant::Color); // QBrush
+  addStandardRole("foreground"    , Qt::ForegroundRole   , QVariant::Color); // QBrush
+  addStandardRole("text_alignment", Qt::TextAlignmentRole, alignMeta); // Qt::Alignment
+  addStandardRole("text_color"    , Qt::ForegroundRole   , QVariant::Color, /*alias*/true);
+  addStandardRole("decoration"    , Qt::DecorationRole   , QVariant::Invalid); // QIcon, QPixmap,
+                                                                               // QColor
+
+  const auto *baseModel = dynamic_cast<const CQBaseModel *>(model);
+
+  if (baseModel) {
+    for (const auto &roleData : baseModel->roleDatas()) {
+      addRole(roleData);
+    }
   }
 
-  return names;
+  //---
+
+  auto addHeaderRoleData = [&](Qt::Orientation orient, const RoleData &data) {
+    s_headerRoleDatas[orient].push_back(data);
+
+    s_headerRoleNameMap[orient][data.role] = data.name;
+
+    s_headerNameRoleMap    [orient][data.name] = data.role;
+    s_headerNameWritableMap[orient][data.name] = data.writable;
+    s_headerNameTypeMap    [orient][data.name] = data.type;
+  };
+
+  auto addHHeaderRole = [&](const QString &name, int role,
+                            const QVariant::Type &type=QVariant::Invalid) {
+    addHeaderRoleData(Qt::Horizontal,
+                      RoleData(name, role, type, CQBaseModel::Standard(), CQBaseModel::Writable()));
+  };
+
+  auto addVHeaderRole = [&](const QString &name, int role,
+                            const QVariant::Type &type=QVariant::Invalid) {
+    addHeaderRoleData(Qt::Vertical,
+                      RoleData(name, role, type, CQBaseModel::Standard(), CQBaseModel::Writable()));
+  };
+
+  // TODO: set writable ?
+  addHHeaderRole("display", Qt::DisplayRole);
+  addHHeaderRole("edit"   , Qt::EditRole);
+  addHHeaderRole("tooltip", Qt::ToolTipRole);
+
+  if (baseModel) {
+    for (const auto &roleData : baseModel->headerRoleDatas(Qt::Horizontal)) {
+      addHeaderRoleData(Qt::Horizontal, roleData);
+    }
+  }
+
+#if 0
+  addHHeaderRole("format" , roleCast(CQBaseModelRole::Format));
+  addHHeaderRole("iformat", roleCast(CQBaseModelRole::IFormat));
+  addHHeaderRole("oformat", roleCast(CQBaseModelRole::OFormat));
+
+  addHHeaderRole("fill_color" , roleCast(CQBaseModelRole::FillColor));
+  addHHeaderRole("symbol_type", roleCast(CQBaseModelRole::SymbolType));
+  addHHeaderRole("symbol_size", roleCast(CQBaseModelRole::SymbolSize));
+  addHHeaderRole("font_size"  , roleCast(CQBaseModelRole::FontSize));
+#endif
+
+  addVHeaderRole("display", Qt::DisplayRole);
+
+  return true;
+}
+
+const QStringList &
+roleNames(QAbstractItemModel *model)
+{
+  static QStringList s_names;
+
+  if (initRoles(model))
+    s_names.clear();
+
+  if (s_names.empty()) {
+    for (const auto &roleName : s_roleNames)
+      s_names << roleName.name;
+  }
+
+  return s_names;
 };
 
 int
-nameToRole(const QString &name)
+nameToRole(QAbstractItemModel *model, const QString &name)
 {
-  // standard
-  if      (name == "display"       ) return Qt::DisplayRole;
-  else if (name == "edit"          ) return Qt::EditRole;
-  else if (name == "user"          ) return Qt::UserRole;
-  else if (name == "font"          ) return Qt::FontRole;
-  else if (name == "size_hint"     ) return Qt::SizeHintRole;
-  else if (name == "tool_tip"      ) return Qt::ToolTipRole;
-  else if (name == "background"    ) return Qt::BackgroundRole;
-  else if (name == "foreground"    ) return Qt::ForegroundRole;
-  else if (name == "text_alignment") return Qt::TextAlignmentRole;
-  else if (name == "text_color"    ) return Qt::ForegroundRole;
-  else if (name == "decoration"    ) return Qt::DecorationRole;
+  (void) initRoles(model);
 
-  // custom
-  else if (name == "type"              ) return roleCast(CQBaseModelRole::Type);
-  else if (name == "base_type"         ) return roleCast(CQBaseModelRole::BaseType);
-  else if (name == "type_values"       ) return roleCast(CQBaseModelRole::TypeValues);
-  else if (name == "min"               ) return roleCast(CQBaseModelRole::Min);
-  else if (name == "max"               ) return roleCast(CQBaseModelRole::Max);
-  else if (name == "sum"               ) return roleCast(CQBaseModelRole::Sum);
-  else if (name == "sorted"            ) return roleCast(CQBaseModelRole::Sorted);
-  else if (name == "sort_order"        ) return roleCast(CQBaseModelRole::SortOrder);
-  else if (name == "title"             ) return roleCast(CQBaseModelRole::Title);
-  else if (name == "tip"               ) return roleCast(CQBaseModelRole::Tip);
-  else if (name == "key"               ) return roleCast(CQBaseModelRole::Key);
-  else if (name == "raw_value"         ) return roleCast(CQBaseModelRole::RawValue);
-  else if (name == "intermediate_value") return roleCast(CQBaseModelRole::IntermediateValue);
-  else if (name == "cached_value"      ) return roleCast(CQBaseModelRole::CachedValue);
-  else if (name == "output_value"      ) return roleCast(CQBaseModelRole::OutputValue);
-  else if (name == "group"             ) return roleCast(CQBaseModelRole::Group);
-  else if (name == "format"            ) return roleCast(CQBaseModelRole::Format);
-  else if (name == "iformat"           ) return roleCast(CQBaseModelRole::IFormat);
-  else if (name == "oformat"           ) return roleCast(CQBaseModelRole::OFormat);
-  else if (name == "data_min"          ) return roleCast(CQBaseModelRole::DataMin);
-  else if (name == "data_max"          ) return roleCast(CQBaseModelRole::DataMax);
-  else if (name == "header_type"       ) return roleCast(CQBaseModelRole::HeaderType);
-  else if (name == "header_type_values") return roleCast(CQBaseModelRole::HeaderTypeValues);
-  else if (name == "fill_color"        ) return roleCast(CQBaseModelRole::FillColor);
-  else if (name == "symbol_type"       ) return roleCast(CQBaseModelRole::SymbolType);
-  else if (name == "symbol_size"       ) return roleCast(CQBaseModelRole::SymbolSize);
-  else if (name == "font_size"         ) return roleCast(CQBaseModelRole::FontSize);
-  else if (name == "style"             ) return roleCast(CQBaseModelRole::Style);
-  else if (name == "export"            ) return roleCast(CQBaseModelRole::Export);
+  auto p = s_nameRoleMap.find(name);
+
+  if (p != s_nameRoleMap.end())
+    return (*p).second;
 
   bool ok;
 
   int role = name.toInt(&ok);
+  if (! ok) return -1;
 
-  if (ok)
-    return role;
-
-  return -1;
+  return role;
 }
+
+QString
+roleToName(QAbstractItemModel *model, int role)
+{
+  (void) initRoles(model);
+
+  auto p = s_roleNameMap.find(role);
+
+  if (p != s_roleNameMap.end())
+    return (*p).second;
+
+  return QString::number(role);
+}
+
+bool
+nameIsStandard(QAbstractItemModel *model, const QString &name)
+{
+  (void) initRoles(model);
+
+  auto p = s_nameStandardMap.find(name);
+
+  if (p != s_nameStandardMap.end())
+    return (*p).second;
+
+  return false;
+}
+
+bool
+nameIsWritable(QAbstractItemModel *model, const QString &name)
+{
+  (void) initRoles(model);
+
+  auto p = s_nameWritableMap.find(name);
+
+  if (p != s_nameWritableMap.end())
+    return (*p).second;
+
+  return false;
+}
+
+QVariant::Type
+nameType(QAbstractItemModel *model, const QString &name)
+{
+  (void) initRoles(model);
+
+  auto p = s_nameTypeMap.find(name);
+
+  if (p != s_nameTypeMap.end())
+    return (*p).second;
+
+  return QVariant::Invalid;
+}
+
+//---
+
+const QStringList &
+headerRoleNames(QAbstractItemModel *model, Qt::Orientation orient)
+{
+  static QStringList s_names;
+
+  if (initRoles(model))
+    s_names.clear();
+
+  if (s_names.empty()) {
+    const auto &headerRoleDatas = s_headerRoleDatas[orient];
+
+    for (const auto &roleName : headerRoleDatas)
+      s_names << roleName.name;
+  }
+
+  return s_names;
+};
+
+int
+headerNameToRole(QAbstractItemModel *model, Qt::Orientation orient, const QString &name)
+{
+  (void) initRoles(model);
+
+  const auto &headerNameRoleMap = s_headerNameRoleMap[orient];
+
+  auto p = headerNameRoleMap.find(name);
+
+  if (p != headerNameRoleMap.end())
+    return (*p).second;
+
+  bool ok;
+
+  int role = name.toInt(&ok);
+  if (! ok) return -1;
+
+  return role;
+}
+
+QString
+headerRoleToName(QAbstractItemModel *model, Qt::Orientation orient, int role)
+{
+  (void) initRoles(model);
+
+  const auto &headerRoleNameMap = s_headerRoleNameMap[orient];
+
+  auto p = headerRoleNameMap.find(role);
+
+  if (p != headerRoleNameMap.end())
+    return (*p).second;
+
+  return QString::number(role);
+}
+
+QVariant::Type
+headerNameType(QAbstractItemModel *model, Qt::Orientation orient, const QString &name)
+{
+  (void) initRoles(model);
+
+  const auto &headerNameTypeMap = s_headerNameTypeMap[orient];
+
+  auto p = headerNameTypeMap.find(name);
+
+  if (p != headerNameTypeMap.end())
+    return (*p).second;
+
+  return QVariant::Invalid;
+}
+
+bool
+headerNameIsWritable(QAbstractItemModel *model, Qt::Orientation orient, const QString &name)
+{
+  (void) initRoles(model);
+
+  const auto &headerNameWritableMap = s_headerNameWritableMap[orient];
+
+  auto p = headerNameWritableMap.find(name);
+
+  if (p != headerNameWritableMap.end())
+    return (*p).second;
+
+  return false;
+}
+
+//---
 
 bool
 stringToRowCol(const QString &str, int &row, int &col)

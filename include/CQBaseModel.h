@@ -16,7 +16,7 @@
  *   . type
  *   . base type
  *   . type values (name values)
- *   . min, max
+ *   . min, max, sum
  *   . is key
  *   . is sorted
  *   . sort order
@@ -27,9 +27,10 @@
 class CQBaseModel : public QAbstractItemModel {
   Q_OBJECT
 
-  Q_PROPERTY(QString  title       READ title       WRITE setTitle      )
-  Q_PROPERTY(int      maxTypeRows READ maxTypeRows WRITE setMaxTypeRows)
-  Q_PROPERTY(DataType dataType    READ dataType)
+  Q_PROPERTY(QString     title        READ title        WRITE setTitle       )
+  Q_PROPERTY(int         maxTypeRows  READ maxTypeRows  WRITE setMaxTypeRows )
+  Q_PROPERTY(QModelIndex currentIndex READ currentIndex WRITE setCurrentIndex)
+  Q_PROPERTY(DataType    dataType     READ dataType)
 
   Q_ENUMS(DataType)
 
@@ -43,6 +44,38 @@ class CQBaseModel : public QAbstractItemModel {
     DATA_TYPE_GNUPLOT,
     DATA_TYPE_PIVOT
   };
+
+  class Bool {
+   public:
+    Bool() { }
+
+    Bool(bool b) { b_ = b; };
+
+    operator bool() const { return b_; }
+
+   private:
+    bool b_ { false };
+  };
+
+  class Standard : public Bool { public: Standard() { } Standard(bool b) : Bool(b) { } };
+  class Writable : public Bool { public: Writable() { } Writable(bool b) : Bool(b) { } };
+
+  struct RoleData {
+    QString        name;
+    int            role { 0 };
+    QVariant::Type type { QVariant::Invalid };
+    Standard       standard;
+    Writable       writable;
+
+    RoleData() { }
+
+    RoleData(const QString &name, int role, const QVariant::Type &type=QVariant::Invalid,
+             const Standard &standard=Standard(), const Writable &writable=Writable()) :
+     name(name), role(role), type(type), standard(standard), writable(writable) {
+    }
+  };
+
+  using RoleDatas = std::vector<RoleData>;
 
  protected:
   struct ColumnTypeData {
@@ -70,6 +103,10 @@ class CQBaseModel : public QAbstractItemModel {
   //! get/set max rows to process to determine type
   int maxTypeRows() const { return maxTypeRows_; }
   void setMaxTypeRows(int i) { maxTypeRows_ = i; }
+
+  //! get/set current index
+  const QModelIndex &currentIndex() const { return currentIndex_; }
+  void setCurrentIndex(const QModelIndex &ind);
 
   //! get/set input data type
   const DataType &dataType() const { return dataType_; }
@@ -167,6 +204,11 @@ class CQBaseModel : public QAbstractItemModel {
 
   //---
 
+  virtual const RoleDatas &headerRoleDatas(Qt::Orientation orient) const;
+  virtual const RoleDatas &roleDatas() const;
+
+  //---
+
   //! get/set value for name
   QVariant nameValue(const QString &name) const;
   void setNameValue(const QString &name, const QVariant &value);
@@ -208,7 +250,7 @@ class CQBaseModel : public QAbstractItemModel {
 
   void copyColumnHeaderRoles(QAbstractItemModel *toModel, int c1, int c2) const;
 
- signals:
+ Q_SIGNALS:
   //! signals when data changed
   void columnTypeChanged      (int column);
   void columnBaseTypeChanged  (int column);
@@ -219,6 +261,8 @@ class CQBaseModel : public QAbstractItemModel {
   void columnTitleChanged     (int column);
   void columnTipChanged       (int column);
   void columnHeaderTypeChanged(int column);
+
+  void currentIndexChanged(const QModelIndex &ind);
 
  protected:
   using RowValues     = std::map<int, QVariant>;
@@ -292,6 +336,8 @@ class CQBaseModel : public QAbstractItemModel {
   int         maxTypeRows_ { -1 };             //!< max rows to determine type
   DataType    dataType_    { DATA_TYPE_NONE }; //!< input data type
   NameValues  nameValues_;                     //!< name values
+
+  QModelIndex currentIndex_; //!< current index
 
   mutable std::mutex mutex_;            //!< mutex
   mutable std::mutex typeMutex_;        //!< type mutex

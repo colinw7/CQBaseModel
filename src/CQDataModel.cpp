@@ -433,6 +433,8 @@ data(const QModelIndex &index, int role) const
     columnData1.roleRowValues[role][row] = value;
   };
 
+  using CQModelUtil::roleCast;
+
   //---
 
   if      (role == Qt::DisplayRole) {
@@ -444,7 +446,7 @@ data(const QModelIndex &index, int role) const
     // check in cached values
     QVariant var;
 
-    if (getRowRoleValue(r, CQModelUtil::roleCast(CQBaseModelRole::CachedValue), var)) {
+    if (getRowRoleValue(r, roleCast(CQBaseModelRole::CachedValue), var)) {
       if (type == CQBaseModelType::NONE || isSameType(var, type))
         return var;
     }
@@ -461,7 +463,7 @@ data(const QModelIndex &index, int role) const
       auto var1 = typeStringToVariant(var.toString(), type);
 
       if (var1.isValid())
-        setRowRoleValue(r, CQModelUtil::roleCast(CQBaseModelRole::CachedValue), var1);
+        setRowRoleValue(r, roleCast(CQBaseModelRole::CachedValue), var1);
 
       return var1;
     }
@@ -471,16 +473,16 @@ data(const QModelIndex &index, int role) const
   else if (role == Qt::ToolTipRole) {
     return cells[size_t(c)];
   }
-  else if (role == CQModelUtil::roleCast(CQBaseModelRole::RawValue) ||
-           role == CQModelUtil::roleCast(CQBaseModelRole::IntermediateValue) ||
-           role == CQModelUtil::roleCast(CQBaseModelRole::CachedValue) ||
-           role == CQModelUtil::roleCast(CQBaseModelRole::OutputValue)) {
+  else if (role == roleCast(CQBaseModelRole::RawValue) ||
+           role == roleCast(CQBaseModelRole::IntermediateValue) ||
+           role == roleCast(CQBaseModelRole::CachedValue) ||
+           role == roleCast(CQBaseModelRole::OutputValue)) {
     QVariant var;
 
     if (getRowRoleValue(r, role, var))
       return var;
 
-    if (role == CQModelUtil::roleCast(CQBaseModelRole::RawValue)) {
+    if (role == roleCast(CQBaseModelRole::RawValue)) {
       return cells[size_t(c)];
     }
 
@@ -556,6 +558,8 @@ setData(const QModelIndex &index, const QVariant &value, int role)
     columnData.roleRowValues[role][row] = value;
   };
 
+  using CQModelUtil::roleCast;
+
   //---
 
   if      (role == Qt::DisplayRole) {
@@ -573,17 +577,17 @@ setData(const QModelIndex &index, const QVariant &value, int role)
 
     cells[size_t(c)] = value;
 
-    clearRowRoleValue(r, CQModelUtil::roleCast(CQBaseModelRole::RawValue));
-    clearRowRoleValue(r, CQModelUtil::roleCast(CQBaseModelRole::IntermediateValue));
-    clearRowRoleValue(r, CQModelUtil::roleCast(CQBaseModelRole::CachedValue));
-    clearRowRoleValue(r, CQModelUtil::roleCast(CQBaseModelRole::OutputValue));
+    clearRowRoleValue(r, roleCast(CQBaseModelRole::RawValue));
+    clearRowRoleValue(r, roleCast(CQBaseModelRole::IntermediateValue));
+    clearRowRoleValue(r, roleCast(CQBaseModelRole::CachedValue));
+    clearRowRoleValue(r, roleCast(CQBaseModelRole::OutputValue));
 
     Q_EMIT dataChanged(index, index, QVector<int>(1, role));
   }
-  else if (role == CQModelUtil::roleCast(CQBaseModelRole::RawValue) ||
-           role == CQModelUtil::roleCast(CQBaseModelRole::IntermediateValue) ||
-           role == CQModelUtil::roleCast(CQBaseModelRole::CachedValue) ||
-           role == CQModelUtil::roleCast(CQBaseModelRole::OutputValue)) {
+  else if (role == roleCast(CQBaseModelRole::RawValue) ||
+           role == roleCast(CQBaseModelRole::IntermediateValue) ||
+           role == roleCast(CQBaseModelRole::CachedValue) ||
+           role == roleCast(CQBaseModelRole::OutputValue)) {
     setRowRoleValue(r, role, value);
   }
   else {
@@ -594,6 +598,42 @@ setData(const QModelIndex &index, const QVariant &value, int role)
 
   return true;
 }
+
+//------
+
+const CQBaseModel::RoleDatas &
+CQDataModel::
+roleDatas() const
+{
+  static RoleDatas s_roleDatas;
+
+  //---
+
+  using Standard = CQBaseModel::Standard;
+  using Writable = CQBaseModel::Writable;
+
+  auto addRole = [&](const QString &name, int role, const QVariant::Type &type,
+                     const Writable &writable=Writable()) {
+    s_roleDatas.emplace_back(name, role, type, Standard(), writable);
+  };
+
+  using CQModelUtil::roleCast;
+
+  //---
+
+  addRole("raw_value"         , roleCast(CQBaseModelRole::RawValue         ),
+          QVariant::Invalid, Writable());
+  addRole("intermediate_value", roleCast(CQBaseModelRole::IntermediateValue),
+          QVariant::Invalid, Writable());
+  addRole("cached_value"      , roleCast(CQBaseModelRole::CachedValue      ),
+          QVariant::Invalid, Writable());
+  addRole("output_value"      , roleCast(CQBaseModelRole::OutputValue      ),
+          QVariant::Invalid, Writable());
+
+  return s_roleDatas;
+}
+
+//------
 
 QModelIndex
 CQDataModel::

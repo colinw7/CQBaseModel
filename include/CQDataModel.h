@@ -89,6 +89,10 @@ class CQDataModel : public CQBaseModel {
 
   //---
 
+  const RoleDatas &roleDatas() const override;
+
+  //---
+
   virtual bool acceptsRow(const Cells &cells) const;
 
   //---

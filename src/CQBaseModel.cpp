@@ -180,6 +180,15 @@ genColumnTypeI(ColumnData &columnData)
   }
 }
 
+void
+CQBaseModel::
+setCurrentIndex(const QModelIndex &ind)
+{
+  currentIndex_ = ind;
+
+  Q_EMIT currentIndexChanged(currentIndex_);
+}
+
 CQBaseModelType
 CQBaseModel::
 columnType(int column) const
@@ -754,57 +763,61 @@ headerData(int section, Qt::Orientation orientation, int role) const
     return QVariant(CQModelUtil::typeCast(type));
   };
 
+  using CQModelUtil::roleCast;
+
+  //---
+
   // generic column data
   if      (orientation == Qt::Horizontal) {
-    if      (role == static_cast<int>(CQBaseModelRole::Type)) {
+    if      (role == roleCast(CQBaseModelRole::Type)) {
       auto type = columnType(section);
 
       return typeVariant(type);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::BaseType)) {
+    else if (role == roleCast(CQBaseModelRole::BaseType)) {
       auto type = columnBaseType(section);
 
       return typeVariant(type);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::TypeValues)) {
+    else if (role == roleCast(CQBaseModelRole::TypeValues)) {
       return QVariant(columnTypeValues(section));
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Min)) {
+    else if (role == roleCast(CQBaseModelRole::Min)) {
       return columnMin(section);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Max)) {
+    else if (role == roleCast(CQBaseModelRole::Max)) {
       return columnMax(section);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Sum)) {
+    else if (role == roleCast(CQBaseModelRole::Sum)) {
       return columnSum(section);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Key)) {
+    else if (role == roleCast(CQBaseModelRole::Key)) {
       return isColumnKey(section);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Sorted)) {
+    else if (role == roleCast(CQBaseModelRole::Sorted)) {
       return isColumnSorted(section);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::SortOrder)) {
+    else if (role == roleCast(CQBaseModelRole::SortOrder)) {
       return columnSortOrder(section);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Title)) {
+    else if (role == roleCast(CQBaseModelRole::Title)) {
       return columnTitle(section);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Tip)) {
+    else if (role == roleCast(CQBaseModelRole::Tip)) {
       return columnTip(section);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::DataMin)) {
+    else if (role == roleCast(CQBaseModelRole::DataMin)) {
       return columnMin(section);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::DataMax)) {
+    else if (role == roleCast(CQBaseModelRole::DataMax)) {
       return columnMax(section);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::HeaderType)) {
+    else if (role == roleCast(CQBaseModelRole::HeaderType)) {
       auto type = columnHeaderType(section);
 
       return typeVariant(type);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::HeaderTypeValues)) {
+    else if (role == roleCast(CQBaseModelRole::HeaderTypeValues)) {
       return QVariant(headerTypeValues(section));
     }
     else {
@@ -813,7 +826,7 @@ headerData(int section, Qt::Orientation orientation, int role) const
   }
   // generic row data
   else if (orientation == Qt::Vertical) {
-    if (role == static_cast<int>(CQBaseModelRole::Group)) {
+    if (role == roleCast(CQBaseModelRole::Group)) {
       return rowGroup(section);
     }
     else {
@@ -831,11 +844,15 @@ bool
 CQBaseModel::
 setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)
 {
+  using CQModelUtil::roleCast;
+
+  //---
+
   // generic column data
   bool rc = false;
 
   if      (orientation == Qt::Horizontal) {
-    if      (role == static_cast<int>(CQBaseModelRole::Type)) {
+    if      (role == roleCast(CQBaseModelRole::Type)) {
       bool ok { false };
 
       auto type = variantToType(value, &ok);
@@ -843,7 +860,7 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
 
       rc = setColumnType(section, type);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::BaseType)) {
+    else if (role == roleCast(CQBaseModelRole::BaseType)) {
       bool ok { false };
 
       auto type = variantToType(value, &ok);
@@ -851,42 +868,42 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
 
       rc = setColumnBaseType(section, type);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::TypeValues)) {
+    else if (role == roleCast(CQBaseModelRole::TypeValues)) {
       auto str = value.toString();
 
       rc = setColumnTypeValues(section, str);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Min)) {
+    else if (role == roleCast(CQBaseModelRole::Min)) {
       rc = setColumnMin(section, value);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Max)) {
+    else if (role == roleCast(CQBaseModelRole::Max)) {
       rc = setColumnMax(section, value);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Sum)) {
+    else if (role == roleCast(CQBaseModelRole::Sum)) {
       rc = setColumnSum(section, value);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Key)) {
+    else if (role == roleCast(CQBaseModelRole::Key)) {
       rc = setColumnKey(section, value.toBool());
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Sorted)) {
+    else if (role == roleCast(CQBaseModelRole::Sorted)) {
       rc = setColumnSorted(section, value.toBool());
     }
-    else if (role == static_cast<int>(CQBaseModelRole::SortOrder)) {
+    else if (role == roleCast(CQBaseModelRole::SortOrder)) {
       rc = setColumnSortOrder(section, static_cast<Qt::SortOrder>(value.toInt()));
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Title)) {
+    else if (role == roleCast(CQBaseModelRole::Title)) {
       rc = setColumnTitle(section, value.toString());
     }
-    else if (role == static_cast<int>(CQBaseModelRole::Tip)) {
+    else if (role == roleCast(CQBaseModelRole::Tip)) {
       rc = setColumnTip(section, value.toString());
     }
-    else if (role == static_cast<int>(CQBaseModelRole::DataMin)) {
+    else if (role == roleCast(CQBaseModelRole::DataMin)) {
       assert(false);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::DataMax)) {
+    else if (role == roleCast(CQBaseModelRole::DataMax)) {
       assert(false);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::HeaderType)) {
+    else if (role == roleCast(CQBaseModelRole::HeaderType)) {
       bool ok { false };
 
       auto type = variantToType(value, &ok);
@@ -894,7 +911,7 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
 
       return setColumnHeaderType(section, type);
     }
-    else if (role == static_cast<int>(CQBaseModelRole::HeaderTypeValues)) {
+    else if (role == roleCast(CQBaseModelRole::HeaderTypeValues)) {
       auto str = value.toString();
 
       rc = setHeaderTypeValues(section, str);
@@ -905,7 +922,7 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
   }
   // generic row data
   else if (orientation == Qt::Vertical) {
-    if (role == static_cast<int>(CQBaseModelRole::Group)) {
+    if (role == roleCast(CQBaseModelRole::Group)) {
       rc = setRowGroup(section, value);
     }
     else {
@@ -942,6 +959,87 @@ data(const QModelIndex &index, int role) const
 
   //return QAbstractItemModel::data(index, role);
   return QVariant();
+}
+
+//------
+
+const CQBaseModel::RoleDatas &
+CQBaseModel::
+headerRoleDatas(Qt::Orientation orient) const
+{
+  static std::map<Qt::Orientation, CQBaseModel::RoleDatas> s_headerRoleDatas;
+
+  //---
+
+  using Standard = CQBaseModel::Standard;
+  using Writable = CQBaseModel::Writable;
+
+  auto addHeaderRole = [&](Qt::Orientation orient, const QString &name, int role,
+                           const QVariant::Type &type, const Writable &writable) {
+    s_headerRoleDatas[orient].emplace_back(name, role, type, Standard(), writable);
+  };
+
+  auto addHHeaderRole = [&](const QString &name, int role, const QVariant::Type &type,
+                            const Writable &writable=Writable()) {
+    addHeaderRole(Qt::Horizontal, name, role, type, writable);
+  };
+
+  auto addVHeaderRole = [&](const QString &name, int role, const QVariant::Type &type,
+                            const Writable &writable=Writable()) {
+    addHeaderRole(Qt::Vertical, name, role, type, writable);
+  };
+
+  using CQModelUtil::roleCast;
+
+  //---
+
+  if      (orient == Qt::Horizontal) {
+    addHHeaderRole("type"              , roleCast(CQBaseModelRole::Type),
+                   QVariant::UserType, Writable(true));
+    addHHeaderRole("base_type"         , roleCast(CQBaseModelRole::BaseType),
+                   QVariant::UserType, Writable(true));
+    addHHeaderRole("type_values"       , roleCast(CQBaseModelRole::TypeValues),
+                   QVariant::String  , Writable(true));
+    addHHeaderRole("min"               , roleCast(CQBaseModelRole::Min),
+                   QVariant::Invalid , Writable(true));
+    addHHeaderRole("max"               , roleCast(CQBaseModelRole::Max),
+                   QVariant::Invalid , Writable(true));
+    addHHeaderRole("sum"               , roleCast(CQBaseModelRole::Sum),
+                   QVariant::Invalid , Writable(true));
+    addHHeaderRole("key"               , roleCast(CQBaseModelRole::Key),
+                   QVariant::Bool    , Writable(true));
+    addHHeaderRole("sorted"            , roleCast(CQBaseModelRole::Sorted),
+                   QVariant::Bool    , Writable(true));
+    addHHeaderRole("sort_order"        , roleCast(CQBaseModelRole::SortOrder),
+                   QVariant::Int     , Writable(true));
+    addHHeaderRole("title"             , roleCast(CQBaseModelRole::Title),
+                   QVariant::String  , Writable(true));
+    addHHeaderRole("tip"               , roleCast(CQBaseModelRole::Tip),
+                   QVariant::String  , Writable(true));
+    addHHeaderRole("data_min"          , roleCast(CQBaseModelRole::DataMin),
+                   QVariant::Invalid , Writable(false));
+    addHHeaderRole("data_max"          , roleCast(CQBaseModelRole::DataMax),
+                   QVariant::Invalid , Writable(false));
+    addHHeaderRole("header_type"       , roleCast(CQBaseModelRole::HeaderType),
+                   QVariant::UserType, Writable(true));
+    addHHeaderRole("header_type_values", roleCast(CQBaseModelRole::HeaderTypeValues),
+                   QVariant::Invalid , Writable(true));
+  }
+  else if (orient == Qt::Vertical) {
+    addVHeaderRole("group", roleCast(CQBaseModelRole::Group),
+                   QVariant::Invalid, Writable(true));
+  }
+
+  return s_headerRoleDatas[orient];
+}
+
+const CQBaseModel::RoleDatas &
+CQBaseModel::
+roleDatas() const
+{
+  static CQBaseModel::RoleDatas s_roleDatas;
+
+  return s_roleDatas;
 }
 
 //------
@@ -1170,23 +1268,27 @@ void
 CQBaseModel::
 copyColumnHeaderRoles(QAbstractItemModel *toModel, int c1, int c2) const
 {
+  using CQModelUtil::roleCast;
+
+  //---
+
   static std::vector<int> hroles = {{
     Qt::DisplayRole,
-    CQModelUtil::roleCast(CQBaseModelRole::Type),
-    CQModelUtil::roleCast(CQBaseModelRole::BaseType),
-    CQModelUtil::roleCast(CQBaseModelRole::TypeValues),
-    CQModelUtil::roleCast(CQBaseModelRole::Min),
-    CQModelUtil::roleCast(CQBaseModelRole::Max),
-    CQModelUtil::roleCast(CQBaseModelRole::Sum),
-    CQModelUtil::roleCast(CQBaseModelRole::Key),
-    CQModelUtil::roleCast(CQBaseModelRole::Sorted),
-    CQModelUtil::roleCast(CQBaseModelRole::SortOrder),
-    CQModelUtil::roleCast(CQBaseModelRole::Title),
-    CQModelUtil::roleCast(CQBaseModelRole::Tip),
-    CQModelUtil::roleCast(CQBaseModelRole::DataMin),
-    CQModelUtil::roleCast(CQBaseModelRole::DataMax),
-    CQModelUtil::roleCast(CQBaseModelRole::HeaderType),
-    CQModelUtil::roleCast(CQBaseModelRole::HeaderTypeValues)
+    roleCast(CQBaseModelRole::Type),
+    roleCast(CQBaseModelRole::BaseType),
+    roleCast(CQBaseModelRole::TypeValues),
+    roleCast(CQBaseModelRole::Min),
+    roleCast(CQBaseModelRole::Max),
+    roleCast(CQBaseModelRole::Sum),
+    roleCast(CQBaseModelRole::Key),
+    roleCast(CQBaseModelRole::Sorted),
+    roleCast(CQBaseModelRole::SortOrder),
+    roleCast(CQBaseModelRole::Title),
+    roleCast(CQBaseModelRole::Tip),
+    roleCast(CQBaseModelRole::DataMin),
+    roleCast(CQBaseModelRole::DataMax),
+    roleCast(CQBaseModelRole::HeaderType),
+    roleCast(CQBaseModelRole::HeaderTypeValues)
   }};
 
   // copy horizontal header data
