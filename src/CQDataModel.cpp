@@ -513,6 +513,24 @@ setData(const QModelIndex &index, const QVariant &value, int role)
   int r = index.row();
   int c = index.column();
 
+  bool changed;
+
+  if (! setModelData(r, c, value, role, &changed))
+    return false;
+
+  if (changed)
+    Q_EMIT dataChanged(index, index, QVector<int>(1, role));
+
+  return true;
+}
+
+bool
+CQDataModel::
+setModelData(int r, int c, const QVariant &value, int role, bool *changed)
+{
+  if (changed)
+    *changed = true;
+
   auto nr = data_.size();
 
   if (r < 0 || size_t(r) >= nr)
@@ -566,8 +584,6 @@ setData(const QModelIndex &index, const QVariant &value, int role)
     //auto type = columnType(c);
 
     cells[size_t(c)] = value;
-
-    Q_EMIT dataChanged(index, index, QVector<int>(1, role));
   }
   else if (role == Qt::EditRole) {
     //auto type = columnType(c);
@@ -581,19 +597,18 @@ setData(const QModelIndex &index, const QVariant &value, int role)
     clearRowRoleValue(r, roleCast(CQBaseModelRole::IntermediateValue));
     clearRowRoleValue(r, roleCast(CQBaseModelRole::CachedValue));
     clearRowRoleValue(r, roleCast(CQBaseModelRole::OutputValue));
-
-    Q_EMIT dataChanged(index, index, QVector<int>(1, role));
   }
   else if (role == roleCast(CQBaseModelRole::RawValue) ||
            role == roleCast(CQBaseModelRole::IntermediateValue) ||
            role == roleCast(CQBaseModelRole::CachedValue) ||
            role == roleCast(CQBaseModelRole::OutputValue)) {
     setRowRoleValue(r, role, value);
+
+    if (changed)
+      *changed = false;
   }
   else {
     setRowRoleValue(r, role, value);
-
-    Q_EMIT dataChanged(index, index, QVector<int>(1, role));
   }
 
   return true;

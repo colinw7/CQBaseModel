@@ -89,6 +89,11 @@ class CQDataModel : public CQBaseModel {
 
   //---
 
+  bool setModelData(int r, int c, const QVariant &value,
+                    int role=Qt::DisplayRole, bool *changed=nullptr);
+
+  //---
+
   const RoleDatas &roleDatas() const override;
 
   //---

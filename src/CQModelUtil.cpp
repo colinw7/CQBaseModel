@@ -149,6 +149,31 @@ modelReal(const QAbstractItemModel *model, const QModelIndex &ind, bool &ok)
 }
 
 long
+modelConvInteger(const QAbstractItemModel *model, const QModelIndex &ind, bool &ok)
+{
+  auto var = modelValue(model, ind, ok);
+
+  long i = 0;
+
+  if (ok) {
+    if      (var.type() == QVariant::LongLong)
+      i = var.value<qlonglong>();
+    else if (var.type() == QVariant::Double) {
+      double r = var.toDouble(&ok);
+
+      i = var.toInt(&ok);
+
+      if (r - double(i) > 1E-6)
+        ok = false;
+    }
+    else
+      i = var.toInt(&ok);
+  }
+
+  return i;
+}
+
+long
 modelInteger(const QAbstractItemModel *model, const QModelIndex &ind, bool &ok)
 {
   auto var = modelValue(model, ind, ok);
@@ -220,7 +245,7 @@ calcColumnType(const QAbstractItemModel *model, int icolumn, int maxRows)
       if (isInt_) {
         bool ok;
 
-        (void) modelInteger(model, ind, ok);
+        (void) modelConvInteger(model, ind, ok);
 
         if (ok)
           return State::SKIP;
@@ -346,7 +371,8 @@ initRoles(const QAbstractItemModel *model)
   s_nameStandardMap.clear();
   s_nameTypeMap    .clear();
 
-  using Standard = CQBaseModel::Standard;
+//using Standard = CQBaseModel::Standard;
+  using Writable = CQBaseModel::Writable;
 
   auto addRole = [&](const RoleData &data, bool alias=false) {
     if (! alias) {
@@ -362,8 +388,14 @@ initRoles(const QAbstractItemModel *model)
   };
 
   auto addStandardRole = [&](const QString &name, int role,
-                             const QVariant::Type &type=QVariant::Invalid, bool alias=false) {
-    addRole(RoleData(name, role, type, Standard(true)), alias);
+                             const QVariant::Type &type=QVariant::Invalid,
+                             const Writable &writable=Writable(), bool alias=false) {
+    auto roleData = RoleData(name, role, type);
+
+    roleData.standard = true;
+    roleData.writable = writable;
+
+    addRole(roleData, alias);
   };
 
   //---
@@ -374,11 +406,14 @@ initRoles(const QAbstractItemModel *model)
   addStandardRole("display"       , Qt::DisplayRole      , QVariant::Invalid); // QVariant
   addStandardRole("edit"          , Qt::EditRole         , QVariant::Invalid);
   addStandardRole("user"          , Qt::UserRole         , QVariant::Invalid);
-  addStandardRole("font"          , Qt::FontRole         , QVariant::Font); // QFont
+  addStandardRole("font"          , Qt::FontRole         ,
+                  QVariant::Font, Writable(true)); // QFont
   addStandardRole("size_hint"     , Qt::SizeHintRole     , QVariant::Invalid);
   addStandardRole("tool_tip"      , Qt::ToolTipRole      , QVariant::String);
-  addStandardRole("background"    , Qt::BackgroundRole   , QVariant::Color); // QBrush
-  addStandardRole("foreground"    , Qt::ForegroundRole   , QVariant::Color); // QBrush
+  addStandardRole("background"    , Qt::BackgroundRole   ,
+                  QVariant::Color, Writable(true)); // QBrush
+  addStandardRole("foreground"    , Qt::ForegroundRole   ,
+                  QVariant::Color, Writable(true)); // QBrush
   addStandardRole("text_alignment", Qt::TextAlignmentRole, alignMeta); // Qt::Alignment
   addStandardRole("text_color"    , Qt::ForegroundRole   , QVariant::Color, /*alias*/true);
   addStandardRole("decoration"    , Qt::DecorationRole   , QVariant::Invalid); // QIcon, QPixmap,

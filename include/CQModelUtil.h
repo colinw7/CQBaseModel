@@ -45,6 +45,9 @@ QVariant modelValue(const QAbstractItemModel *model, const QModelIndex &ind, boo
 //! get model real value
 double modelReal(const QAbstractItemModel *model, const QModelIndex &ind, bool &ok);
 
+//! get model value converted to integer (exactly)
+long modelConvInteger(const QAbstractItemModel *model, const QModelIndex &ind, bool &ok);
+
 //! get model integer value
 long modelInteger(const QAbstractItemModel *model, const QModelIndex &ind, bool &ok);
 
