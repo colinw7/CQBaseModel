@@ -95,7 +95,8 @@ copyModel(CQBaseModel *model)
   columnDatas_ = model->columnDatas_;
   rowDatas_    = model->rowDatas_;
   dataType_    = model->dataType_;
-  nameValues_  = model->nameValues_;
+
+  metaNameValues_ = model->metaNameValues_;
 
   endResetModel();
 }
@@ -1046,19 +1047,50 @@ roleDatas() const
 
 QVariant
 CQBaseModel::
-nameValue(const QString &name) const
+metaNameValue(const QString &name, const QString &key) const
 {
-  auto p = nameValues_.find(name);
-  if (p == nameValues_.end()) return QVariant();
+  auto pn = metaNameValues_.find(name);
+  if (pn == metaNameValues_.end()) return QVariant();
 
-  return (*p).second;
+  auto pk = (*pn).second.find(key);
+  if (pk == (*pn).second.end()) return QVariant();
+
+  return (*pk).second;
 }
 
 void
 CQBaseModel::
-setNameValue(const QString &name, const QVariant &value)
+setMetaNameValue(const QString &name, const QString &key, const QVariant &value)
 {
-  nameValues_[name] = value;
+  metaNameValues_[name][key] = value;
+}
+
+QStringList
+CQBaseModel::
+metaNames() const
+{
+  QStringList names;
+
+  for (const auto &pn : metaNameValues_)
+    names << pn.first;
+
+  return names;
+}
+
+QStringList
+CQBaseModel::
+metaNameKeys(const QString &name) const
+{
+  QStringList keys;
+
+  auto pn = metaNameValues_.find(name);
+
+  if (pn != metaNameValues_.end()) {
+    for (const auto &pk : (*pn).second)
+      keys << pk.first;
+  }
+
+  return keys;
 }
 
 //------

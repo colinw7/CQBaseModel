@@ -209,9 +209,12 @@ class CQBaseModel : public QAbstractItemModel {
 
   //---
 
-  //! get/set value for name
-  QVariant nameValue(const QString &name) const;
-  void setNameValue(const QString &name, const QVariant &value);
+  //! get/set value for name and key
+  QVariant metaNameValue(const QString &name, const QString &key=QString()) const;
+  void setMetaNameValue(const QString &name, const QString &key, const QVariant &value);
+
+  QStringList metaNames() const;
+  QStringList metaNameKeys(const QString &name) const;
 
   //---
 
@@ -265,10 +268,11 @@ class CQBaseModel : public QAbstractItemModel {
   void currentIndexChanged(const QModelIndex &ind);
 
  protected:
-  using RowValues     = std::map<int, QVariant>;
-  using RoleRowValues = std::map<int, RowValues>;
-  using NameValues    = std::map<QString, QVariant>;
-  using ModelType     = CQBaseModelType;
+  using RowValues      = std::map<int, QVariant>;
+  using RoleRowValues  = std::map<int, RowValues>;
+  using KeyValue       = std::map<QString, QVariant>;
+  using MetaNameValues = std::map<QString, KeyValue>;
+  using ModelType      = CQBaseModelType;
 
   //---
 
@@ -335,13 +339,15 @@ class CQBaseModel : public QAbstractItemModel {
   RowDatas    rowDatas_;                       //!< row datas
   int         maxTypeRows_ { -1 };             //!< max rows to determine type
   DataType    dataType_    { DATA_TYPE_NONE }; //!< input data type
-  NameValues  nameValues_;                     //!< name values
+
+  MetaNameValues metaNameValues_; //!< meta name values
 
   QModelIndex currentIndex_; //!< current index
 
-  mutable std::mutex mutex_;            //!< mutex
-  mutable std::mutex typeMutex_;        //!< type mutex
-  int                resetDepth_ { 0 }; //!< reset model depth
+  mutable std::mutex mutex_;     //!< mutex
+  mutable std::mutex typeMutex_; //!< type mutex
+
+  int resetDepth_ { 0 }; //!< reset model depth
 };
 
 #endif
