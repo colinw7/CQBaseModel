@@ -23,7 +23,7 @@ class CQSelModelTest : public QFrame {
 
   void init();
 
-  QSize sizeHint() const { return QSize(800, 600); }
+  QSize sizeHint() const override { return QSize(800, 600); }
 
  private:
   bool        commentHeader_   { false };

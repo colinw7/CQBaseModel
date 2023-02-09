@@ -12,7 +12,7 @@ class CQSelDelegate : public QItemDelegate {
   CQSelView *view() const { return view_; }
 
   void paint(QPainter *painter, const QStyleOptionViewItem &option,
-             const QModelIndex &index) const;
+             const QModelIndex &index) const override;
 
  private:
   CQSelView *view_ { nullptr };
