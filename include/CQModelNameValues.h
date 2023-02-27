@@ -12,11 +12,11 @@ class CQModelNameValues {
   using NameValues = std::map<QString, QVariant>;
 
  public:
-  CQModelNameValues() { }
+  CQModelNameValues();
 
-  CQModelNameValues(const QString &str) { (void) fromString(str); }
+  CQModelNameValues(const QString &str);
 
-  virtual ~CQModelNameValues() { }
+  virtual ~CQModelNameValues();
 
   const NameValues &nameValues() const { return nameValues_; }
   void setNameValues(const NameValues &v) { nameValues_ = v; }

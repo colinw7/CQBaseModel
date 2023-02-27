@@ -4,6 +4,22 @@
 #include <QColor>
 #include <QFont>
 
+CQModelNameValues::
+CQModelNameValues()
+{
+}
+
+CQModelNameValues::
+CQModelNameValues(const QString &str)
+{
+  (void) fromString(str);
+}
+
+CQModelNameValues::
+~CQModelNameValues()
+{
+}
+
 // <name>=<value>,...
 QString
 CQModelNameValues::

@@ -81,10 +81,11 @@ enum class CQBaseModelType {
   POLYGON_LIST    = QVariant::UserType + 106,
   CONNECTION_LIST = QVariant::UserType + 107,
   NAME_PAIR       = QVariant::UserType + 108,
-  COLUMN          = QVariant::UserType + 109,
-  COLUMN_LIST     = QVariant::UserType + 110,
-  ENUM            = QVariant::UserType + 111,
-  LENGTH          = QVariant::UserType + 112
+  NAME_VALUES     = QVariant::UserType + 109,
+  COLUMN          = QVariant::UserType + 110,
+  COLUMN_LIST     = QVariant::UserType + 111,
+  ENUM            = QVariant::UserType + 112,
+  LENGTH          = QVariant::UserType + 113
 };
 
 #endif

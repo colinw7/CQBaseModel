@@ -55,6 +55,7 @@ void initTypes() {
     addType(CQBaseModelType::STYLE          , "style"          );
     addType(CQBaseModelType::CONNECTION_LIST, "connection_list");
     addType(CQBaseModelType::NAME_PAIR      , "name_pair"      );
+    addType(CQBaseModelType::NAME_VALUES    , "name_values"    );
     addType(CQBaseModelType::COLUMN         , "column"         );
     addType(CQBaseModelType::COLUMN_LIST    , "column_list"    );
     addType(CQBaseModelType::ENUM           , "enum"           );
