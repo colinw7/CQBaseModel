@@ -140,6 +140,10 @@ class CQBaseModel : public QAbstractItemModel {
   QVariant columnSum(int column) const;
   bool setColumnSum(int column, const QVariant &v);
 
+  //! get/set column custom target value
+  QVariant columnTarget(int column) const;
+  bool setColumnTarget(int column, const QVariant &v);
+
   //! get/set column is key (unique values)
   bool isColumnKey(int column) const;
   bool setColumnKey(int column, bool b);
@@ -289,6 +293,7 @@ class CQBaseModel : public QAbstractItemModel {
     QVariant      min;                                    //!< custom min value
     QVariant      max;                                    //!< custom max value
     QVariant      sum;                                    //!< custom value sum
+    QVariant      target;                                 //!< custom value sum
     bool          key             { false };              //!< is key
     bool          sorted          { false };              //!< is sorted
     Qt::SortOrder sortOrder       { Qt::AscendingOrder }; //!< sort ortder

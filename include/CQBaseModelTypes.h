@@ -45,7 +45,8 @@ enum class CQBaseModelRole {
   Style             = Type + 26,        //!< cell style
   Export            = Type + 27,        //!< export role
   Sum               = Type + 28,        //!< column user value sum
-  BadValue          = Type + 29         //!< column user bad value
+  Target            = Type + 29,        //!< column user target value
+  BadValue          = Type + 30         //!< column user bad value
 };
 
 //! model value types supported by CQBaseModel

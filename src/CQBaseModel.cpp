@@ -372,6 +372,34 @@ setColumnSum(int column, const QVariant &v)
   return true;
 }
 
+QVariant
+CQBaseModel::
+columnTarget(int column) const
+{
+  if (column < 0 || column >= columnCount())
+    return QVariant();
+
+  const auto &columnData = getColumnData(column);
+
+  return columnData.target;
+}
+
+bool
+CQBaseModel::
+setColumnTarget(int column, const QVariant &v)
+{
+  if (column < 0 || column >= columnCount())
+    return false;
+
+  auto &columnData = getColumnData(column);
+
+  columnData.target = v;
+
+  Q_EMIT columnRangeChanged(column);
+
+  return true;
+}
+
 bool
 CQBaseModel::
 isColumnKey(int column) const
@@ -793,6 +821,9 @@ headerData(int section, Qt::Orientation orientation, int role) const
     else if (role == roleCast(CQBaseModelRole::Sum)) {
       return columnSum(section);
     }
+    else if (role == roleCast(CQBaseModelRole::Target)) {
+      return columnTarget(section);
+    }
     else if (role == roleCast(CQBaseModelRole::Key)) {
       return isColumnKey(section);
     }
@@ -883,6 +914,9 @@ setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, i
     }
     else if (role == roleCast(CQBaseModelRole::Sum)) {
       rc = setColumnSum(section, value);
+    }
+    else if (role == roleCast(CQBaseModelRole::Target)) {
+      rc = setColumnTarget(section, value);
     }
     else if (role == roleCast(CQBaseModelRole::Key)) {
       rc = setColumnKey(section, value.toBool());
@@ -1008,6 +1042,8 @@ headerRoleDatas(Qt::Orientation orient) const
                    QVariant::Invalid , Writable(true));
     addHHeaderRole("sum"               , roleCast(CQBaseModelRole::Sum),
                    QVariant::Invalid , Writable(true));
+    addHHeaderRole("target"            , roleCast(CQBaseModelRole::Target),
+                   QVariant::Double  , Writable(true));
     addHHeaderRole("key"               , roleCast(CQBaseModelRole::Key),
                    QVariant::Bool    , Writable(true));
     addHHeaderRole("sorted"            , roleCast(CQBaseModelRole::Sorted),
@@ -1313,6 +1349,7 @@ copyColumnHeaderRoles(QAbstractItemModel *toModel, int c1, int c2) const
     roleCast(CQBaseModelRole::Min),
     roleCast(CQBaseModelRole::Max),
     roleCast(CQBaseModelRole::Sum),
+    roleCast(CQBaseModelRole::Target),
     roleCast(CQBaseModelRole::Key),
     roleCast(CQBaseModelRole::Sorted),
     roleCast(CQBaseModelRole::SortOrder),
