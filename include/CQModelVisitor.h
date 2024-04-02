@@ -37,6 +37,8 @@ class CQModelVisitor {
 
   virtual ~CQModelVisitor() { }
 
+  const QAbstractItemModel *model() const { return model_; }
+
   int numCols() const { return numCols_; }
 
   int numRows() const { return numRows_; }
