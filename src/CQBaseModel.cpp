@@ -987,10 +987,21 @@ data(const QModelIndex &index, int role) const
   if (role == Qt::TextAlignmentRole) {
     auto type = columnType(index.column());
 
+    Qt::Alignment align;
+
     if (type == CQBaseModelType::INTEGER || type == CQBaseModelType::REAL)
-      return QVariant(Qt::AlignRight | Qt::AlignVCenter);
+      align = Qt::AlignRight | Qt::AlignVCenter;
     else
-      return QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+      align = Qt::AlignLeft | Qt::AlignVCenter;
+
+    auto avar = columnNameValue(index.column(), "alignment");
+
+    if (avar.isValid()) {
+      bool ok;
+      align = static_cast<Qt::Alignment>(avar.toInt(&ok));
+    }
+
+    return QVariant(align);
   }
 
   //return QAbstractItemModel::data(index, role);
@@ -1162,13 +1173,10 @@ modelColumnNameToInd(const QAbstractItemModel *model, const QString &name)
   //---
 
   bool ok { false };
-
   int column = name.toInt(&ok);
+  if (! ok) return -1;
 
-  if (ok)
-    return column;
-
-  return -1;
+  return column;
 }
 
 //------
