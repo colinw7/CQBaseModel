@@ -14,7 +14,7 @@ class CQDataModelTest : public QFrame {
   CQDataModelTest();
  ~CQDataModelTest();
 
-  QSize sizeHint() const { return QSize(800, 600); }
+  QSize sizeHint() const override { return QSize(800, 600); }
 
  private:
   CQTableView*  table_ { nullptr };
